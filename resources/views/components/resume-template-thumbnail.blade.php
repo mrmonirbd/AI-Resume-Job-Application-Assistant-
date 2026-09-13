@@ -41,11 +41,7 @@
         @case('sidebar')
             <div class="grid h-full grid-cols-[0.82fr_1.42fr]">
                 <aside class="p-4" style="background: {{ $dark }}; color: #ffffff;">
-                    @if (data_get($settings, 'photo'))
-                        <x-demo-profile-image class="h-14 w-14 border-4 border-white/80" />
-                    @else
-                        <div class="h-8 w-16 rounded-sm bg-white/90"></div>
-                    @endif
+                    <x-demo-profile-image class="h-14 w-14 border-4 border-white/80" />
                     <p class="mt-4 {{ $section }} font-black uppercase tracking-[0.16em] opacity-80">Contact</p>
                     <p class="{{ $tiny }} mt-2 opacity-75">demo@example.com<br>Dhaka, BD<br>+880 1700 000</p>
                     <p class="mt-4 {{ $section }} font-black uppercase tracking-[0.16em] opacity-80">Skills</p>
@@ -131,8 +127,8 @@
         @case('technical')
             <div class="grid h-full grid-cols-[0.8fr_1.45fr]">
                 <aside class="p-4" style="background: {{ $dark }}; color: #ffffff;">
-                    <div class="rounded-md bg-white/90 p-2">
-                        <div class="h-7 rounded-sm" style="background: {{ $soft }};"></div>
+                    <div class="flex h-14 items-center justify-center rounded-md bg-white/90 p-1">
+                        <x-demo-profile-image class="h-11 w-11 border-2 border-white shadow-sm" />
                     </div>
                     <p class="mt-4 {{ $section }} font-black uppercase tracking-[0.16em] opacity-80">Tech Stack</p>
                     <div class="mt-2 grid grid-cols-2 gap-1.5">

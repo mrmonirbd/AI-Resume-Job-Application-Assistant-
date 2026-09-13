@@ -7,6 +7,7 @@ use App\Models\Resume;
 use App\Models\ResumeTemplate;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Blade;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -60,6 +61,32 @@ class ResumeTemplateTest extends TestCase
             ->assertSee('Professional')
             ->assertSee('Executive')
             ->assertSee('Modern');
+    }
+
+    public function test_sidebar_template_thumbnail_uses_demo_profile_image(): void
+    {
+        $template = new ResumeTemplate([
+            'name' => 'Executive Ledger',
+            'slug' => 'executive-ledger',
+            'category' => 'Executive',
+            'layout' => 'left-sidebar-dark',
+            'font_family' => 'Georgia',
+            'accent_color' => '#334155',
+            'settings' => [
+                'style' => 'sidebar',
+                'surface' => '#ffffff',
+                'soft' => '#e2e8f0',
+                'dark' => '#1f2937',
+            ],
+        ]);
+
+        $html = Blade::render('<x-resume-template-thumbnail :template="$template" />', [
+            'template' => $template,
+        ]);
+
+        $this->assertStringContainsString('data-template-layout="left-sidebar-dark"', $html);
+        $this->assertStringContainsString('images/demo-profile.svg', $html);
+        $this->assertStringNotContainsString('h-8 w-16 rounded-sm bg-white/90', $html);
     }
 
     public function test_created_resume_uses_selected_template_defaults(): void
