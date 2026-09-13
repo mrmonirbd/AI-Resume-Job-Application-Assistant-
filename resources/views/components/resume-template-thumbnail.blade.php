@@ -1,4 +1,4 @@
-@props(['template', 'compact' => false, 'heightClass' => null])
+@props(['template', 'compact' => false, 'heightClass' => null, 'preview' => false])
 
 @php
     $settings = $template->settings ?? [];
@@ -8,9 +8,35 @@
     $soft = data_get($settings, 'soft', '#eef2ff');
     $dark = data_get($settings, 'dark', '#111827');
     $surface = data_get($settings, 'surface', '#ffffff');
-    $heightClass = $heightClass ?? ($compact ? 'h-64' : 'h-80');
-    $tiny = $compact ? 'text-[6px] leading-[1.3]' : 'text-[7px] leading-[1.45]';
-    $section = $compact ? 'text-[6px]' : 'text-[7px]';
+    $heightClass = $heightClass ?? ($preview ? 'aspect-[210/297] h-auto' : ($compact ? 'h-64' : 'h-80'));
+    $tiny = $preview ? 'text-[11px] leading-5' : ($compact ? 'text-[6px] leading-[1.3]' : 'text-[7px] leading-[1.45]');
+    $section = $preview ? 'text-[10px]' : ($compact ? 'text-[6px]' : 'text-[7px]');
+    $pagePadding = $preview ? 'p-7' : 'p-5';
+    $panelPadding = $preview ? 'p-6' : 'p-4';
+    $nameSize = $preview ? 'text-[22px]' : 'text-[14px]';
+    $compactNameSize = $preview ? 'text-[19px]' : 'text-[13px]';
+    $bandHeight = $preview ? 'h-32' : 'h-24';
+    $demoLines = $preview
+        ? [
+            'Credit analyst with verified reporting, portfolio review, and client documentation experience.',
+            'Prepared financial statements, risk notes, and decision-ready summaries for business teams.',
+            'Collected client documents, reviewed field information, and coordinated report updates.',
+            'Built Excel trackers, risk dashboards, and reusable analysis notes for recurring reviews.',
+        ]
+        : [
+            'Reviews financial statements and portfolio risk.',
+            'Prepares verified reports for business decisions.',
+            'Collects client documents through site visits.',
+        ];
+    $fullSections = $preview
+        ? ['Summary', 'Experience', 'Education', 'Projects', 'Certifications', 'References']
+        : ['Summary', 'Experience', 'Education', 'Skills', 'References'];
+    $splitSections = $preview
+        ? ['Summary', 'Experience', 'Education', 'Credit Risk', 'Projects']
+        : ['Summary', 'Experience', 'Education'];
+    $sideItems = $preview
+        ? ['Skills', 'Tools', 'Languages', 'Links', 'Awards']
+        : ['Skills', 'Tools', 'Languages', 'Links'];
     $name = match ($style) {
         'editorial', 'academic' => 'Zara Rahman',
         'timeline', 'technical' => 'Arif Hasan',
@@ -24,11 +50,6 @@
         'Academic', 'Graduate' => 'Research Assistant',
         default => 'Credit Analyst',
     };
-    $demoLines = [
-        'Reviews financial statements and portfolio risk.',
-        'Prepares verified reports for business decisions.',
-        'Collects client documents through site visits.',
-    ];
 @endphp
 
 <div
@@ -313,25 +334,28 @@
 
         @case('split')
             <div class="h-full">
-                <header class="grid h-24 grid-cols-[1.25fr_0.75fr]">
-                    <div class="p-5">
-                        <h3 class="text-[14px] font-black uppercase tracking-wide">{{ $name }}</h3>
+                <header class="grid {{ $bandHeight }} grid-cols-[1.25fr_0.75fr]">
+                    <div class="{{ $pagePadding }}">
+                        <h3 class="{{ $nameSize }} font-black uppercase tracking-wide">{{ $name }}</h3>
                         <p class="{{ $tiny }} mt-1 font-bold" style="color: {{ $accent }};">{{ $role }}</p>
+                        @if ($preview)
+                            <p class="{{ $tiny }} mt-2 text-neutral-500">demo@example.com · Dhaka, Bangladesh</p>
+                        @endif
                     </div>
                     <div style="background: {{ $accent }};"></div>
                 </header>
-                <main class="grid grid-cols-[1.1fr_0.9fr] gap-5 p-5">
-                    <section class="space-y-3">
-                        @foreach (['Summary', 'Experience', 'Education'] as $item)
+                <main class="grid grid-cols-[1.08fr_0.92fr] gap-6 {{ $pagePadding }}">
+                    <section class="{{ $preview ? 'space-y-5' : 'space-y-3' }}">
+                        @foreach ($splitSections as $item)
                             <div>
                                 <p class="{{ $section }} font-black uppercase tracking-[0.16em]">{{ $item }}</p>
-                                <p class="{{ $tiny }} mt-1 text-neutral-600">{{ $demoLines[$loop->index] }}</p>
+                                <p class="{{ $tiny }} mt-1 text-neutral-600">{{ $demoLines[$loop->index % count($demoLines)] }}</p>
                             </div>
                         @endforeach
                     </section>
-                    <aside class="space-y-2">
-                        @foreach (['Skills', 'Tools', 'Languages', 'Links'] as $item)
-                            <p class="{{ $tiny }} rounded-full px-2 py-1" style="background: {{ $soft }};">{{ $item }}</p>
+                    <aside class="{{ $preview ? 'space-y-3 pt-2' : 'space-y-2' }}">
+                        @foreach ($sideItems as $item)
+                            <p class="{{ $tiny }} rounded-full px-3 py-1.5" style="background: {{ $soft }};">{{ $item }}</p>
                         @endforeach
                     </aside>
                 </main>
@@ -477,14 +501,14 @@
             @break
 
         @default
-            <div class="h-full p-5">
+            <div class="h-full {{ $pagePadding }}">
                 <header @class(['text-center' => in_array($header, ['centered', 'small-center'], true)])>
-                    <h3 class="text-[14px] font-black uppercase tracking-wide">{{ $name }}</h3>
+                    <h3 class="{{ $nameSize }} font-black uppercase tracking-wide">{{ $name }}</h3>
                     <p class="{{ $tiny }} mt-1 font-bold" style="color: {{ $accent }};">{{ $role }}</p>
                     <p class="{{ $tiny }} mt-1 text-neutral-500">demo@example.com · Dhaka</p>
                 </header>
-                <main class="mt-5 space-y-3">
-                    @foreach (['Summary', 'Experience', 'Education', 'Skills', 'References'] as $item)
+                <main class="{{ $preview ? 'mt-8 space-y-5' : 'mt-5 space-y-3' }}">
+                    @foreach ($fullSections as $item)
                         <section>
                             <p class="{{ $section }} font-black uppercase tracking-[0.16em]">{{ $item }}</p>
                             <p class="{{ $tiny }} mt-1 text-neutral-600">{{ $demoLines[$loop->index % 3] }}</p>

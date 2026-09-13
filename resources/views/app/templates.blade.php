@@ -88,9 +88,9 @@
                                             <button type="button" class="rounded-md border border-black/10 px-3 py-2 text-xs font-black text-neutral-600 hover:bg-[#f6f7f9]" @click="activeTemplate = null">Close</button>
                                         </header>
 
-                                        <div class="grid gap-6 p-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)]">
-                                            <div class="rounded-lg bg-[#f6f7f9] p-3">
-                                                <x-resume-template-thumbnail :template="$template" height-class="h-[30rem] sm:h-[36rem] lg:h-[42rem]" class="mx-auto max-w-2xl rounded-md shadow-lg" />
+                                        <div class="grid gap-6 p-5 lg:grid-cols-[minmax(21rem,1fr)_minmax(17rem,0.55fr)]">
+                                            <div class="flex justify-center rounded-lg bg-[#f6f7f9] p-4">
+                                                <x-resume-template-thumbnail :template="$template" :preview="true" class="mx-auto w-full max-w-[30rem] rounded-md shadow-lg" />
                                             </div>
 
                                             <aside class="flex flex-col gap-5">

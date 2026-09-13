@@ -32,6 +32,8 @@ class ResumeTemplateTest extends TestCase
             ->assertSee('onchange="this.form.submit()"', false)
             ->assertSee('Preview')
             ->assertSee('Use this template')
+            ->assertSee('aspect-[210/297]', false)
+            ->assertSee('max-w-[30rem]', false)
             ->assertDontSee('Uncategorized')
             ->assertDontSee('Apply')
             ->assertSee('images/demo-profile.svg')
