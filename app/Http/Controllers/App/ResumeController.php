@@ -23,16 +23,26 @@ class ResumeController extends Controller
         ]);
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
+        $templates = ResumeTemplate::where('is_active', true)
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get()
+            ->sortBy(fn (ResumeTemplate $template): int => (int) data_get($template->settings, 'sort', 999))
+            ->values();
+        $selectedTemplate = $templates->firstWhere('slug', $request->query('template')) ?: $templates->first();
+
         return view('app.resumes.create', [
-            'templates' => ResumeTemplate::where('is_active', true)->orderBy('category')->get(),
+            'templates' => $templates,
+            'selectedTemplate' => $selectedTemplate,
         ]);
     }
 
     public function store(StoreResumeRequest $request): RedirectResponse
     {
-        $template = ResumeTemplate::find($request->input('template_id')) ?: ResumeTemplate::first();
+        $template = ResumeTemplate::where('is_active', true)->find($request->input('template_id'))
+            ?: ResumeTemplate::where('is_active', true)->first();
 
         $resume = $request->user()->resumes()->create([
             ...$request->validated(),
@@ -97,10 +107,16 @@ class ResumeController extends Controller
         $resume = $request->user()->masterResume()->first();
 
         if (! $resume) {
+            $template = ResumeTemplate::where('slug', 'classic-clarity')->first()
+                ?: ResumeTemplate::where('is_active', true)->first();
+
             $resume = $request->user()->resumes()->create([
+                'template_id' => $template?->id,
                 'title' => 'Master Resume',
                 'type' => 'master',
                 'is_master' => true,
+                'accent_color' => $template?->accent_color ?? '#2563eb',
+                'font_family' => $template?->font_family ?? 'Inter',
                 'last_edited_at' => now(),
             ]);
 

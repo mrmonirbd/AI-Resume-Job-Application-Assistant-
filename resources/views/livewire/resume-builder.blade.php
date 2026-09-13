@@ -32,6 +32,15 @@
                     <input wire:model.defer="overview.professional_title" class="mt-2 w-full rounded-lg border border-black/10 px-4 py-3 text-sm">
                 </label>
                 <label class="block">
+                    <span class="text-sm font-semibold">Template</span>
+                    <select wire:model.defer="overview.template_id" class="mt-2 w-full rounded-lg border border-black/10 px-4 py-3 text-sm">
+                        @foreach ($templates as $template)
+                            <option value="{{ $template->id }}">{{ $template->name }} · {{ $template->category }}</option>
+                        @endforeach
+                    </select>
+                    @error('overview.template_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </label>
+                <label class="block">
                     <span class="text-sm font-semibold">Accent color</span>
                     <input wire:model.defer="overview.accent_color" type="color" class="mt-2 h-12 w-full rounded-lg border border-black/10 px-2 py-2">
                 </label>
@@ -187,73 +196,17 @@
             <h2 class="text-lg font-black">Live preview</h2>
             <span class="rounded-full bg-neutral-100 px-3 py-1 text-xs font-bold">{{ $resume->template?->name ?? 'Template' }}</span>
         </div>
-        <div class="mt-5 min-h-[720px] rounded-md border border-black/10 bg-white p-7 text-[12px] leading-relaxed shadow-sm" style="font-family: {{ $overview['font_family'] ?? 'Inter' }}, Arial, sans-serif;">
-            <header class="border-b pb-4" style="border-color: {{ $overview['accent_color'] ?? '#2563eb' }}">
-                <h3 class="text-2xl font-black uppercase tracking-wide">{{ $resume->user->name }}</h3>
-                <p class="mt-1 text-sm font-semibold" style="color: {{ $overview['accent_color'] ?? '#2563eb' }}">{{ $overview['professional_title'] ?: $resume->user->professional_title }}</p>
-                <p class="mt-2 text-neutral-500">{{ $resume->user->email }}{{ $resume->user->location ? ' · '.$resume->user->location : '' }}</p>
-            </header>
-
-            @if ($overview['professional_summary'] ?? false)
-                <section class="mt-5">
-                    <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-neutral-500">Summary</h4>
-                    <p class="mt-2 text-neutral-700">{{ $overview['professional_summary'] }}</p>
-                </section>
-            @endif
-
-            @if ($skills->isNotEmpty())
-                <section class="mt-5">
-                    <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-neutral-500">Skills</h4>
-                    <p class="mt-2 text-neutral-700">{{ $skills->pluck('name')->join(' · ') }}</p>
-                </section>
-            @endif
-
-            @if ($experiences->isNotEmpty())
-                <section class="mt-5">
-                    <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-neutral-500">Experience</h4>
-                    <div class="mt-3 space-y-4">
-                        @foreach ($experiences as $experience)
-                            <div>
-                                <p class="font-black">{{ $experience->position }} · {{ $experience->company }}</p>
-                                <p class="text-neutral-500">{{ $experience->start_date }} - {{ $experience->end_date ?: 'Present' }}{{ $experience->location ? ' · '.$experience->location : '' }}</p>
-                                @if ($experience->description)
-                                    <p class="mt-1 text-neutral-700">{{ $experience->description }}</p>
-                                @endif
-                                @if ($experience->bullets)
-                                    <ul class="mt-2 list-disc space-y-1 pl-4 text-neutral-700">
-                                        @foreach ($experience->bullets as $bullet)
-                                            <li>{{ $bullet }}</li>
-                                        @endforeach
-                                    </ul>
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
-                </section>
-            @endif
-
-            @if ($projects->isNotEmpty())
-                <section class="mt-5">
-                    <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-neutral-500">Projects</h4>
-                    <div class="mt-3 space-y-3">
-                        @foreach ($projects as $project)
-                            <div>
-                                <p class="font-black">{{ $project->name }}</p>
-                                <p class="text-neutral-600">{{ $project->description }}</p>
-                            </div>
-                        @endforeach
-                    </div>
-                </section>
-            @endif
-
-            @if ($educations->isNotEmpty())
-                <section class="mt-5">
-                    <h4 class="text-[11px] font-black uppercase tracking-[0.18em] text-neutral-500">Education</h4>
-                    @foreach ($educations as $education)
-                        <p class="mt-2"><strong>{{ $education->school }}</strong>{{ $education->degree ? ' · '.$education->degree : '' }}</p>
-                    @endforeach
-                </section>
-            @endif
-        </div>
+        <x-resume-document-preview
+            :resume="$resume"
+            :overview="$overview"
+            :experiences="$experiences"
+            :educations="$educations"
+            :skills="$skills"
+            :projects="$projects"
+            :certifications="$certifications"
+            :languages="$languages"
+            :links="$links"
+            class="mt-5"
+        />
     </aside>
 </div>

@@ -51,16 +51,30 @@ class DatabaseSeeder extends Seeder
     private function seedTemplates(): void
     {
         $templates = [
-            ['Classic Clarity', 'classic-clarity', 'Professional', 'single-column', 'Inter', '#1f4e79', ['header' => 'centered', 'density' => 'balanced']],
-            ['Executive Ledger', 'executive-ledger', 'Executive', 'two-column-sidebar', 'Georgia', '#334155', ['header' => 'left-rail', 'density' => 'compact']],
-            ['Modern Signal', 'modern-signal', 'Modern', 'split-header', 'Inter', '#0f766e', ['header' => 'banded', 'density' => 'balanced']],
-            ['Minimal Line', 'minimal-line', 'Minimal', 'single-column-rule', 'Arial', '#111827', ['header' => 'thin-rule', 'density' => 'airy']],
-            ['Graduate Focus', 'graduate-focus', 'Graduate', 'education-first', 'Inter', '#4f46e5', ['header' => 'compact', 'density' => 'balanced']],
-            ['Technical Grid', 'technical-grid', 'Modern', 'skills-sidebar', 'IBM Plex Sans', '#0369a1', ['header' => 'grid', 'density' => 'compact']],
-            ['Consultant Brief', 'consultant-brief', 'Professional', 'impact-first', 'Aptos', '#7c2d12', ['header' => 'brief', 'density' => 'balanced']],
-            ['Studio Profile', 'studio-profile', 'Modern', 'portfolio-forward', 'Inter', '#be123c', ['header' => 'portfolio', 'density' => 'airy']],
-            ['Academic Plain', 'academic-plain', 'Minimal', 'publication-forward', 'Times New Roman', '#374151', ['header' => 'formal', 'density' => 'comfortable']],
-            ['Operator Compact', 'operator-compact', 'Professional', 'dense-single-column', 'Arial', '#365314', ['header' => 'compact', 'density' => 'dense']],
+            ['Classic Clarity', 'classic-clarity', 'Professional', 'single-column', 'Inter', '#1f4e79', ['style' => 'classic', 'header' => 'centered', 'density' => 'balanced', 'surface' => '#ffffff', 'soft' => '#e7f0f7', 'sort' => 10]],
+            ['Executive Ledger', 'executive-ledger', 'Executive', 'left-sidebar-dark', 'Georgia', '#334155', ['style' => 'sidebar', 'header' => 'left-rail', 'density' => 'compact', 'sidebar' => 'left', 'surface' => '#ffffff', 'soft' => '#e2e8f0', 'dark' => '#1f2937', 'sort' => 20]],
+            ['Navy Profile', 'navy-profile', 'Executive', 'left-sidebar-navy', 'Inter', '#0f2742', ['style' => 'sidebar', 'header' => 'avatar-rail', 'density' => 'compact', 'sidebar' => 'left', 'surface' => '#ffffff', 'soft' => '#dbeafe', 'dark' => '#0f2742', 'photo' => true, 'sort' => 30]],
+            ['Modern Signal', 'modern-signal', 'Modern', 'split-header', 'Inter', '#0f766e', ['style' => 'split', 'header' => 'banded', 'density' => 'balanced', 'surface' => '#ffffff', 'soft' => '#ccfbf1', 'sort' => 40]],
+            ['Teal Column', 'teal-column', 'Modern', 'left-sidebar-soft', 'Inter', '#6b9f9d', ['style' => 'soft-sidebar', 'header' => 'profile-column', 'density' => 'balanced', 'sidebar' => 'left', 'surface' => '#fbf7f1', 'soft' => '#d7ece8', 'photo' => true, 'sort' => 50]],
+            ['Copper Header', 'copper-header', 'Creative', 'top-band-photo', 'Georgia', '#9a6b55', ['style' => 'top-band', 'header' => 'photo-band', 'density' => 'airy', 'surface' => '#fffaf6', 'soft' => '#ead2c2', 'photo' => true, 'sort' => 60]],
+            ['Black Timeline', 'black-timeline', 'Modern', 'vertical-timeline', 'Inter', '#050505', ['style' => 'timeline', 'header' => 'bold-block', 'density' => 'compact', 'surface' => '#ffffff', 'soft' => '#f3f4f6', 'dark' => '#050505', 'photo' => true, 'sort' => 70]],
+            ['Blue Edge', 'blue-edge', 'Modern', 'framed-corners', 'Inter', '#0f4c81', ['style' => 'edge', 'header' => 'corner-frame', 'density' => 'balanced', 'surface' => '#ffffff', 'soft' => '#e7f2fa', 'sort' => 80]],
+            ['Charcoal Sales', 'charcoal-sales', 'Professional', 'right-rail', 'Aptos', '#2f3b4c', ['style' => 'right-rail', 'header' => 'compact', 'density' => 'balanced', 'sidebar' => 'right', 'surface' => '#ffffff', 'soft' => '#edf0f3', 'dark' => '#2f3b4c', 'photo' => true, 'sort' => 90]],
+            ['Minimal Line', 'minimal-line', 'Minimal', 'single-column-rule', 'Arial', '#111827', ['style' => 'minimal', 'header' => 'thin-rule', 'density' => 'airy', 'surface' => '#ffffff', 'soft' => '#f4f4f5', 'sort' => 100]],
+            ['Clean Accountant', 'clean-accountant', 'Professional', 'compact-columns', 'Arial', '#5b7083', ['style' => 'compact', 'header' => 'small-center', 'density' => 'compact', 'surface' => '#ffffff', 'soft' => '#e5edf2', 'sort' => 110]],
+            ['Marketing Sidebar', 'marketing-sidebar', 'Modern', 'left-rail-accent', 'Inter', '#153d73', ['style' => 'sidebar', 'header' => 'stacked-profile', 'density' => 'balanced', 'sidebar' => 'left', 'surface' => '#ffffff', 'soft' => '#eaf2ff', 'dark' => '#153d73', 'photo' => true, 'sort' => 120]],
+            ['Slate Manager', 'slate-manager', 'Executive', 'left-sidebar-slate', 'Inter', '#334155', ['style' => 'sidebar', 'header' => 'portrait-card', 'density' => 'balanced', 'sidebar' => 'left', 'surface' => '#ffffff', 'soft' => '#e2e8f0', 'dark' => '#334155', 'photo' => true, 'sort' => 130]],
+            ['Rose Designer', 'rose-designer', 'Creative', 'photo-band', 'Inter', '#b48b83', ['style' => 'photo-band', 'header' => 'portrait-band', 'density' => 'airy', 'surface' => '#fffaf8', 'soft' => '#ead6d2', 'photo' => true, 'sort' => 140]],
+            ['Editorial Mono', 'editorial-mono', 'Minimal', 'serif-header', 'Times New Roman', '#3f3f46', ['style' => 'editorial', 'header' => 'formal-rule', 'density' => 'balanced', 'surface' => '#ffffff', 'soft' => '#f4f4f5', 'sort' => 150]],
+            ['Beige Portfolio', 'beige-portfolio', 'Creative', 'wide-feature', 'Georgia', '#6b5745', ['style' => 'feature', 'header' => 'wide-profile', 'density' => 'airy', 'surface' => '#fbf8ef', 'soft' => '#d3c7b3', 'photo' => true, 'sort' => 160]],
+            ['Graduate Focus', 'graduate-focus', 'Graduate', 'education-first', 'Inter', '#4f46e5', ['style' => 'academic', 'header' => 'compact', 'density' => 'balanced', 'surface' => '#ffffff', 'soft' => '#e0e7ff', 'sort' => 170]],
+            ['Analytics Compact', 'analytics-compact', 'Professional', 'dense-single-column', 'Arial', '#365314', ['style' => 'dense', 'header' => 'compact', 'density' => 'dense', 'surface' => '#ffffff', 'soft' => '#ecfccb', 'sort' => 180]],
+            ['Product Lead', 'product-lead', 'Modern', 'two-column-balanced', 'Inter', '#2d6a4f', ['style' => 'balanced', 'header' => 'split-name', 'density' => 'balanced', 'surface' => '#ffffff', 'soft' => '#dcfce7', 'sort' => 190]],
+            ['Finance Brief', 'consultant-brief', 'Executive', 'impact-first', 'Aptos', '#7c2d12', ['style' => 'brief', 'header' => 'brief', 'density' => 'balanced', 'surface' => '#fff7ed', 'soft' => '#fed7aa', 'sort' => 200]],
+            ['Academic Plain', 'academic-plain', 'Academic', 'publication-forward', 'Times New Roman', '#374151', ['style' => 'academic', 'header' => 'formal', 'density' => 'comfortable', 'surface' => '#ffffff', 'soft' => '#f3f4f6', 'sort' => 210]],
+            ['Studio Black', 'studio-profile', 'Creative', 'dark-header', 'Inter', '#111827', ['style' => 'dark-header', 'header' => 'portfolio', 'density' => 'airy', 'surface' => '#ffffff', 'soft' => '#e5e7eb', 'dark' => '#111827', 'photo' => true, 'sort' => 220]],
+            ['Horizon Blue', 'horizon-blue', 'Modern', 'blue-stripe', 'Inter', '#1d4ed8', ['style' => 'stripe', 'header' => 'diagonal-edge', 'density' => 'balanced', 'surface' => '#ffffff', 'soft' => '#dbeafe', 'sort' => 230]],
+            ['Technical Grid', 'technical-grid', 'Technical', 'skills-sidebar', 'IBM Plex Sans', '#0369a1', ['style' => 'technical', 'header' => 'grid', 'density' => 'compact', 'sidebar' => 'left', 'surface' => '#ffffff', 'soft' => '#e0f2fe', 'dark' => '#075985', 'sort' => 240]],
         ];
 
         foreach ($templates as [$name, $slug, $category, $layout, $font, $accent, $settings]) {
@@ -73,7 +87,7 @@ class DatabaseSeeder extends Seeder
                     'font_family' => $font,
                     'accent_color' => $accent,
                     'settings' => $settings,
-                    'is_premium' => ! in_array($slug, ['classic-clarity', 'minimal-line', 'graduate-focus'], true),
+                    'is_premium' => false,
                     'is_active' => true,
                 ]
             );
