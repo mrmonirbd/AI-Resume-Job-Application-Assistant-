@@ -32,6 +32,9 @@ class ResumeTemplateTest extends TestCase
             ->assertSee('onchange="this.form.submit()"', false)
             ->assertSee('Preview')
             ->assertSee('Use this template')
+            ->assertSee('Configuration')
+            ->assertSee('Next to editor')
+            ->assertSee('name="template_slug"', false)
             ->assertSee('aspect-[210/297]', false)
             ->assertSee('max-w-[30rem]', false)
             ->assertDontSee('Uncategorized')
@@ -91,6 +94,48 @@ class ResumeTemplateTest extends TestCase
         $this->assertStringNotContainsString('h-8 w-16 rounded-sm bg-white/90', $html);
     }
 
+    public function test_template_configuration_form_creates_resume_and_redirects_to_editor(): void
+    {
+        $template = ResumeTemplate::create([
+            'name' => 'Modern Signal',
+            'slug' => 'modern-signal',
+            'category' => 'Modern',
+            'layout' => 'split-header',
+            'font_family' => 'Inter',
+            'accent_color' => '#0f766e',
+            'settings' => ['style' => 'split', 'sort' => 40],
+            'is_active' => true,
+        ]);
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+            'onboarding_completed_at' => now(),
+        ]);
+
+        $response = $this->actingAs($user)
+            ->post(route('resumes.store'), [
+                'title' => 'Modern Signal Resume',
+                'professional_title' => 'Credit Analyst',
+                'professional_summary' => 'Prepared verified reports for business teams.',
+                'template_id' => $template->id,
+                'template_slug' => $template->slug,
+                'spacing' => 'comfortable',
+                'accent_color' => '#0f766e',
+                'font_family' => 'Inter',
+            ]);
+        $resume = Resume::query()->firstOrFail();
+
+        $response->assertRedirect(route('resumes.edit', $resume));
+        $this->assertDatabaseHas('resumes', [
+            'id' => $resume->id,
+            'user_id' => $user->id,
+            'title' => 'Modern Signal Resume',
+            'professional_title' => 'Credit Analyst',
+            'template_id' => $template->id,
+            'accent_color' => '#0f766e',
+            'font_family' => 'Inter',
+        ]);
+    }
+
     public function test_created_resume_uses_selected_template_defaults(): void
     {
         $template = ResumeTemplate::create([
@@ -125,6 +170,70 @@ class ResumeTemplateTest extends TestCase
             'accent_color' => '#0f2742',
             'font_family' => 'Inter',
         ]);
+    }
+
+    public function test_resume_export_generates_single_page_a4_pdf(): void
+    {
+        $template = ResumeTemplate::create([
+            'name' => 'Navy Profile',
+            'slug' => 'navy-profile',
+            'category' => 'Executive',
+            'layout' => 'left-sidebar-navy',
+            'font_family' => 'Inter',
+            'accent_color' => '#0f2742',
+            'settings' => [
+                'style' => 'sidebar',
+                'sidebar' => 'left',
+                'dark' => '#0f2742',
+                'soft' => '#dbeafe',
+                'surface' => '#ffffff',
+                'photo' => true,
+            ],
+            'is_active' => true,
+        ]);
+        $user = User::factory()->create([
+            'name' => 'Demo User',
+            'location' => 'Remote',
+            'email_verified_at' => now(),
+            'onboarding_completed_at' => now(),
+        ]);
+        $resume = Resume::create([
+            'user_id' => $user->id,
+            'template_id' => $template->id,
+            'title' => 'Navy Profile Resume',
+            'type' => 'general',
+            'professional_title' => 'Finance Manager',
+            'professional_summary' => 'Finance manager with reporting and credit analysis experience.',
+            'accent_color' => '#0f2742',
+            'font_family' => 'Inter',
+            'spacing' => 'compact',
+            'last_edited_at' => now(),
+        ]);
+        $resume->skills()->createMany([
+            ['name' => 'Financial Reporting', 'sort_order' => 0],
+            ['name' => 'Credit Risk', 'sort_order' => 1],
+        ]);
+        $resume->experiences()->create([
+            'company' => 'Acme Finance',
+            'position' => 'Finance Manager',
+            'description' => 'Prepared portfolio reports and reviewed credit risk.',
+            'start_date' => '2021',
+            'sort_order' => 0,
+        ]);
+        $resume->educations()->create([
+            'school' => 'Dhaka University',
+            'degree' => 'BBA',
+            'field' => 'Finance',
+            'sort_order' => 0,
+        ]);
+
+        $response = $this->actingAs($user)->get(route('resumes.export', $resume));
+        $pdf = $response->baseResponse->getContent();
+
+        $response->assertOk();
+        $this->assertStringStartsWith('%PDF-', $pdf);
+        $this->assertStringContainsString('/Count 1', $pdf);
+        $this->assertStringContainsString('/MediaBox [0.000 0.000 595.280 841.890]', $pdf);
     }
 
     public function test_resume_builder_updates_template_for_existing_resume(): void

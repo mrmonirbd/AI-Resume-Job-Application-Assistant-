@@ -4,20 +4,25 @@
     $accent = $resume->accent_color ?: '#2563eb';
     $soft = data_get($settings, 'soft', '#eef2ff');
     $dark = data_get($settings, 'dark', '#111827');
+    $surface = data_get($settings, 'surface', '#ffffff');
     $title = $resume->professional_title ?: $resume->user->professional_title;
     $contact = collect([$resume->user->email, $resume->user->location])->filter()->map(fn (string $item): string => e($item))->join(' &middot; ');
     $hasSidebar = in_array($style, ['sidebar', 'soft-sidebar', 'right-rail', 'technical'], true);
     $usesDarkSidebar = in_array($style, ['sidebar', 'right-rail', 'technical'], true);
     $sidebarBackground = $usesDarkSidebar ? $dark : $soft;
     $sidebarText = $usesDarkSidebar ? '#ffffff' : '#111827';
+    $profileImagePath = public_path('images/demo-profile.png');
+    $profileImageSource = file_exists($profileImagePath) ? 'data:image/png;base64,'.base64_encode((string) file_get_contents($profileImagePath)) : null;
 @endphp
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8">
         <style>
+            @page { size: A4; margin: 0; }
             * { box-sizing: border-box; }
-            body { color: #111827; font-family: DejaVu Sans, sans-serif; font-size: 11px; line-height: 1.45; margin: 0; }
+            html, body { margin: 0; padding: 0; }
+            body { background: #ffffff; color: #111827; font-family: DejaVu Sans, sans-serif; font-size: 11px; line-height: 1.45; }
             h1 { font-size: 25px; line-height: 1.05; margin: 0; text-transform: uppercase; }
             h2 { color: #111827; font-size: 10px; letter-spacing: 1.8px; margin: 18px 0 8px; text-transform: uppercase; }
             h3 { font-size: 12px; margin: 0; }
@@ -29,30 +34,40 @@
             .rule { border-bottom: 1px solid {{ $accent }}; padding-bottom: 5px; }
             .item { margin-bottom: 10px; }
             .skills { line-height: 1.7; }
-            .sheet { padding: 34px; }
-            .band { background: {{ in_array($style, ['dark-header'], true) ? $dark : $soft }}; padding: 28px 34px; }
+            .page { background: {{ $surface }}; width: 100%; }
+            .sheet { padding: 40pt; }
+            .band { background: {{ in_array($style, ['dark-header'], true) ? $dark : $soft }}; padding: 34pt 40pt; }
             .band h1 { color: {{ in_array($style, ['dark-header'], true) ? '#ffffff' : '#111827' }}; }
             .band .muted { color: {{ in_array($style, ['dark-header'], true) ? '#d1d5db' : '#4b5563' }}; }
-            .content-table { border-collapse: collapse; width: 100%; }
+            .side-fill { background: {{ $sidebarBackground }}; bottom: 0; position: fixed; top: 0; width: 202pt; z-index: 0; }
+            .side-fill-left { left: 0; }
+            .side-fill-right { right: 0; }
+            .content-table { border-collapse: collapse; position: relative; table-layout: fixed; width: 100%; z-index: 1; }
             .content-table td { vertical-align: top; }
-            .side { background: {{ $sidebarBackground }}; color: {{ $sidebarText }}; padding: 28px 20px; width: 34%; }
+            .side { background: transparent; color: {{ $sidebarText }}; padding: 40pt 26pt; width: 202pt; }
             .side h1 { color: {{ $sidebarText }}; font-size: 21px; }
             .side h2 { color: {{ $sidebarText }}; opacity: 0.78; }
             .side .muted { color: {{ $sidebarText }}; opacity: 0.75; }
-            .main { padding: 30px 32px; }
+            .main { padding: 40pt 36pt; width: 393.28pt; }
             .pill { border: 1px solid {{ $usesDarkSidebar ? 'rgba(255,255,255,0.35)' : $accent }}; border-radius: 10px; display: inline-block; margin: 0 4px 5px 0; padding: 3px 7px; }
             .two-col { border-collapse: collapse; width: 100%; }
             .two-col .left { padding-right: 22px; width: 66%; }
             .two-col .right { border-left: 1px solid #e5e7eb; padding-left: 22px; width: 34%; }
             .timeline-item { border-left: 2px solid {{ $accent }}; margin-bottom: 12px; padding-left: 12px; }
+            .avatar { border: 4px solid rgba(255,255,255,0.85); border-radius: 999px; display: block; height: 62pt; margin-bottom: 24pt; width: 62pt; }
         </style>
     </head>
     <body>
+        <div class="page">
         @if ($hasSidebar)
+            <div class="side-fill {{ data_get($settings, 'sidebar') === 'right' ? 'side-fill-right' : 'side-fill-left' }}"></div>
             <table class="content-table">
                 <tr>
                     @if (data_get($settings, 'sidebar') !== 'right')
                         <td class="side">
+                            @if ($profileImageSource)
+                                <img class="avatar" src="{{ $profileImageSource }}" alt="">
+                            @endif
                             <h1>{{ $resume->user->name }}</h1>
                             @if ($title)
                                 <p style="margin-top: 8px;"><strong>{{ $title }}</strong></p>
@@ -130,6 +145,9 @@
 
                     @if (data_get($settings, 'sidebar') === 'right')
                         <td class="side">
+                            @if ($profileImageSource)
+                                <img class="avatar" src="{{ $profileImageSource }}" alt="">
+                            @endif
                             <h2>Contact</h2>
                             <p class="muted">{!! $contact !!}</p>
                             @if ($resume->skills->isNotEmpty())
@@ -297,5 +315,6 @@
                 @endif
             </main>
         @endif
+        </div>
     </body>
 </html>

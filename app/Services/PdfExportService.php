@@ -14,7 +14,7 @@ class PdfExportService
         $resume->loadMissing(['user', 'template', 'experiences', 'educations', 'skills', 'projects', 'certifications', 'languages', 'links']);
 
         return Pdf::loadView('pdf.resume', ['resume' => $resume])
-            ->setPaper('letter')
+            ->setPaper('a4')
             ->download(str($resume->title)->slug().'.pdf');
     }
 
@@ -23,7 +23,7 @@ class PdfExportService
         $coverLetter->loadMissing(['user', 'job']);
 
         return Pdf::loadView('pdf.cover-letter', ['coverLetter' => $coverLetter])
-            ->setPaper('letter')
+            ->setPaper('a4')
             ->download(str($coverLetter->title)->slug().'.pdf');
     }
 }
