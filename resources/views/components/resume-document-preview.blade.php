@@ -24,8 +24,6 @@
     $sectionSpacing = ['compact' => 'mt-3', 'spacious' => 'mt-7'][$spacing] ?? 'mt-5';
     $bodyText = $spacing === 'compact' ? 'text-[11px]' : 'text-[12px]';
     $hasPhoto = (bool) data_get($settings, 'photo', false);
-    $nameParts = collect(explode(' ', $resume->user->name))->filter();
-    $initials = $nameParts->map(fn (string $part): string => mb_strtoupper(mb_substr($part, 0, 1)))->take(2)->join('');
     $contact = collect([$resume->user->email, $resume->user->location])->filter();
     $hasSidebar = in_array($style, ['sidebar', 'soft-sidebar', 'right-rail', 'technical'], true);
     $usesDarkSidebar = in_array($style, ['sidebar', 'right-rail', 'technical'], true);
@@ -41,7 +39,7 @@
         <div class="grid min-h-[720px] {{ $sidebarGridClass }}">
             <aside class="p-5" style="background: {{ $sidebarBackground }}; color: {{ $sidebarText }};">
                 @if ($hasPhoto)
-                    <div class="mb-5 grid h-20 w-20 place-items-center rounded-full border-4 border-white/80 bg-white/20 text-xl font-black">{{ $initials }}</div>
+                    <x-demo-profile-image class="mb-5 h-20 w-20 border-4 border-white/80" />
                 @endif
                 <h3 class="text-xl font-black uppercase leading-tight tracking-wide">{{ $resume->user->name }}</h3>
                 @if ($title)
@@ -135,7 +133,7 @@
             @endif
             <div class="relative flex items-center gap-5">
                 @if ($hasPhoto)
-                    <div class="grid h-20 w-20 shrink-0 place-items-center rounded-full border-4 border-white bg-white/60 text-lg font-black" style="color: {{ $accent }};">{{ $initials }}</div>
+                    <x-demo-profile-image class="h-20 w-20 shrink-0 border-4 border-white" />
                 @endif
                 <div>
                     <h3 class="text-3xl font-black uppercase leading-none tracking-wide" style="color: {{ $style === 'dark-header' ? '#ffffff' : '#111827' }};">{{ $resume->user->name }}</h3>
@@ -197,7 +195,7 @@
     @elseif ($style === 'timeline')
         <div class="p-7">
             <header class="flex items-center gap-5 border-b pb-5" style="border-color: {{ $accent }};">
-                <div class="grid h-20 w-20 shrink-0 place-items-center rounded-full bg-neutral-100 text-lg font-black">{{ $initials }}</div>
+                <x-demo-profile-image class="h-20 w-20 shrink-0 border-4 border-white shadow-sm" />
                 <div>
                     <h3 class="text-3xl font-black uppercase leading-none">{{ $resume->user->name }}</h3>
                     <p class="mt-2 font-semibold" style="color: {{ $accent }};">{{ $title }}</p>

@@ -25,11 +25,41 @@ class ResumeTemplateTest extends TestCase
         $this->actingAs($user)
             ->get(route('templates.index'))
             ->assertSee('polished resume layouts')
+            ->assertSee('Sort')
+            ->assertSee('Name A-Z')
+            ->assertSee('Category')
+            ->assertSee('onchange="this.form.submit()"', false)
+            ->assertSee('Preview')
+            ->assertSee('Use this template')
+            ->assertDontSee('Uncategorized')
+            ->assertDontSee('Apply')
+            ->assertSee('images/demo-profile.svg')
+            ->assertSee('Nusrat Jahan')
+            ->assertSee('Credit Analyst')
             ->assertSee('Classic Clarity')
             ->assertSee('Black Timeline')
-            ->assertSee('Technical Grid');
+            ->assertSee('Technical Grid')
+            ->assertSee('data-template-style="timeline"', false)
+            ->assertSee('data-template-style="technical"', false)
+            ->assertSee('data-template-style="soft-sidebar"', false);
 
         $this->assertGreaterThanOrEqual(24, ResumeTemplate::where('is_active', true)->count());
+    }
+
+    public function test_template_gallery_can_be_grouped_by_category(): void
+    {
+        $this->seed();
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+            'onboarding_completed_at' => now(),
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('templates.index', ['sort' => 'category']))
+            ->assertSee('Category')
+            ->assertSee('Professional')
+            ->assertSee('Executive')
+            ->assertSee('Modern');
     }
 
     public function test_created_resume_uses_selected_template_defaults(): void

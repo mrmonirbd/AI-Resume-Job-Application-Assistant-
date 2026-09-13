@@ -13,7 +13,13 @@
             <form method="POST" action="{{ route('profile.update') }}" class="rounded-lg border border-black/10 bg-white p-6 shadow-sm">
                 @csrf
                 @method('PATCH')
-                <h2 class="text-xl font-black">Profile</h2>
+                <div class="flex items-center gap-4">
+                    <x-demo-profile-image class="h-16 w-16 border border-black/10 shadow-sm" />
+                    <div>
+                        <h2 class="text-xl font-black">Profile</h2>
+                        <p class="mt-1 text-sm text-neutral-500">{{ $user->professional_title ?: 'Career profile' }}</p>
+                    </div>
+                </div>
                 <div class="mt-5 space-y-4">
                     <label class="block">
                         <span class="text-sm font-semibold">Name</span>

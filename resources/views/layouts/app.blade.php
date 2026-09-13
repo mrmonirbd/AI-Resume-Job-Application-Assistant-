@@ -39,8 +39,13 @@
                 <div class="mt-auto pt-8">
                     <div class="rounded-lg border border-black/10 bg-[#f6f7f9] p-4">
                         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">Account</p>
-                        <p class="mt-2 text-sm font-semibold">{{ auth()->user()->name }}</p>
-                        <p class="truncate text-xs text-neutral-500">{{ auth()->user()->email }}</p>
+                        <div class="mt-3 flex items-center gap-3">
+                            <x-demo-profile-image class="h-11 w-11 border border-black/10" />
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold">{{ auth()->user()->name }}</p>
+                                <p class="truncate text-xs text-neutral-500">{{ auth()->user()->email }}</p>
+                            </div>
+                        </div>
                         <div class="mt-4 flex gap-2">
                             <a href="{{ route('profile.edit') }}" class="rounded-md border border-black/10 px-3 py-2 text-xs font-semibold hover:bg-white">Settings</a>
                             <form method="POST" action="{{ route('logout') }}">

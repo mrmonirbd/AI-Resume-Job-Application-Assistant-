@@ -20,4 +20,8 @@
     select {
         background-color: white;
     }
+
+    [x-cloak] {
+        display: none !important;
+    }
 }

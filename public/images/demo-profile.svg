@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320" role="img" aria-labelledby="title desc">
+    <title id="title">Demo profile photo</title>
+    <desc id="desc">A professional demo profile illustration for resume previews.</desc>
+    <defs>
+        <linearGradient id="bg" x1="44" x2="278" y1="24" y2="306" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#D9F3EE"/>
+            <stop offset="0.48" stop-color="#F5DFD3"/>
+            <stop offset="1" stop-color="#DCE8F7"/>
+        </linearGradient>
+        <linearGradient id="jacket" x1="102" x2="219" y1="216" y2="306" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#172033"/>
+            <stop offset="1" stop-color="#2D3D5B"/>
+        </linearGradient>
+        <clipPath id="circle">
+            <circle cx="160" cy="160" r="148"/>
+        </clipPath>
+    </defs>
+    <circle cx="160" cy="160" r="156" fill="#FFFFFF"/>
+    <circle cx="160" cy="160" r="148" fill="url(#bg)"/>
+    <g clip-path="url(#circle)">
+        <path fill="#C9D7E7" d="M-4 255c50-28 96-42 139-42 67 0 106 38 189 17v94H-4v-69Z" opacity=".45"/>
+        <path fill="url(#jacket)" d="M83 320c7-62 39-99 77-99s70 37 77 99H83Z"/>
+        <path fill="#F4F0EA" d="M132 229h56l-11 55-17 18-18-18-10-55Z"/>
+        <path fill="#D9B39A" d="M133 193h54v42c-10 10-19 15-27 15s-17-5-27-15v-42Z"/>
+        <path fill="#F1C3A7" d="M109 142c0-42 23-69 52-69 30 0 51 27 51 69 0 48-23 83-52 83s-51-35-51-83Z"/>
+        <path fill="#2E2431" d="M100 132c5-45 31-78 66-78 31 0 57 26 59 72-20-3-35-11-46-23-17 18-42 28-79 29Z"/>
+        <path fill="#2E2431" d="M96 130c-12 36-8 79 24 99-9-28-11-58-4-86l-20-13Z"/>
+        <path fill="#2E2431" d="M223 127c13 37 8 78-25 102 9-28 11-58 4-86l21-16Z"/>
+        <path fill="#C38F75" d="M154 157c-5 17-8 29-9 35 7 4 16 4 24 0-5-7-9-19-12-35h-3Z" opacity=".42"/>
+        <path fill="#FFFFFF" d="M134 207c17 12 35 12 52 0-5 16-14 25-27 25-12 0-21-9-25-25Z" opacity=".8"/>
+        <path fill="#172033" d="M128 230 160 302l-48-52 12-13-20-8 21-22 3 23Zm65 0-33 72 49-52-12-13 20-8-21-22-3 23Z"/>
+        <circle cx="136" cy="151" r="5" fill="#322432"/>
+        <circle cx="184" cy="151" r="5" fill="#322432"/>
+        <path fill="none" stroke="#A35F59" stroke-linecap="round" stroke-width="4" d="M145 197c10 7 21 7 31 0"/>
+        <path fill="none" stroke="#2E2431" stroke-linecap="round" stroke-width="5" d="M124 136c10-7 22-8 34-3M178 133c12-5 24-4 34 4"/>
+        <circle cx="105" cy="159" r="13" fill="#EAB89B"/>
+        <circle cx="215" cy="159" r="13" fill="#EAB89B"/>
+    </g>
+    <circle cx="160" cy="160" r="147" fill="none" stroke="#FFFFFF" stroke-width="10"/>
+</svg>
