@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Account\ProfileController;
+use App\Http\Controllers\Account\SubscriptionController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\App\AiToolController;
 use App\Http\Controllers\App\ApplicationController;
@@ -17,13 +18,17 @@ use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\LegalPageController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('landing');
+Route::get('{page}', [LegalPageController::class, 'show'])
+    ->whereIn('page', ['terms', 'privacy', 'subscription-policy', 'refund-policy'])
+    ->name('legal.show');
 
 Route::middleware('guest')->group(function () {
     Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+    Route::post('login', [AuthenticatedSessionController::class, 'store'])->middleware('throttle:login');
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
     Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
@@ -47,9 +52,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('profile/password', [ProfileController::class, 'password'])->name('profile.password');
     Route::delete('profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('profile/security', [ProfileController::class, 'security'])->name('profile.security');
+    Route::get('subscription', [SubscriptionController::class, 'show'])->name('subscription.show');
+    Route::get('subscription/payment-history', [SubscriptionController::class, 'paymentHistory'])->name('subscription.payment-history');
+    Route::post('subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
 
     Route::get('master-resume', [ResumeController::class, 'master'])->name('resumes.master');
     Route::get('resumes/{resume}/export', [ResumeController::class, 'export'])->name('resumes.export');
+    Route::get('resumes/{resume}/export-word', [ResumeController::class, 'exportWord'])->name('resumes.export-word');
+    Route::get('resumes/{resume}/export-image', [ResumeController::class, 'exportImage'])->name('resumes.export-image');
     Route::post('resumes/{resume}/duplicate', [ResumeController::class, 'duplicate'])->name('resumes.duplicate');
     Route::resource('resumes', ResumeController::class)->except(['show']);
 

@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(ConceptSeeder::class);
         $this->seedPlans();
         $this->seedTemplates();
         $this->seedAiTools();

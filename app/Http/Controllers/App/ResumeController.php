@@ -7,7 +7,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreResumeRequest;
 use App\Models\Resume;
 use App\Models\ResumeTemplate;
+use App\Services\ImageExportService;
 use App\Services\PdfExportService;
+use App\Services\WordExportService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -131,6 +133,20 @@ class ResumeController extends Controller
         $this->authorize('view', $resume);
 
         return $pdf->resume($resume);
+    }
+
+    public function exportWord(Resume $resume, WordExportService $word): Response
+    {
+        $this->authorize('view', $resume);
+
+        return $word->resume($resume);
+    }
+
+    public function exportImage(Resume $resume, ImageExportService $image): Response
+    {
+        $this->authorize('view', $resume);
+
+        return $image->resume($resume);
     }
 
     private function createDefaultSections(Resume $resume): void

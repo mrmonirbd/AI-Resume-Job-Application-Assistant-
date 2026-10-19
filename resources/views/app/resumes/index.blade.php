@@ -34,7 +34,14 @@
                             @csrf
                             <button class="rounded-lg border border-black/10 px-4 py-2 text-sm font-bold">Duplicate</button>
                         </form>
-                        <a href="{{ route('resumes.export', $resume) }}" class="rounded-lg border border-black/10 px-4 py-2 text-sm font-bold">PDF</a>
+                        <div class="relative" x-data="{ open: false }" @keydown.escape.window="open = false">
+                            <button type="button" class="rounded-lg border border-black/10 px-4 py-2 text-sm font-bold" @click="open = ! open" :aria-expanded="open.toString()">Export</button>
+                            <div x-cloak x-show="open" x-transition.origin.top.right @click.outside="open = false" class="absolute bottom-full left-0 z-30 mb-2 w-40 overflow-hidden rounded-lg border border-black/10 bg-white p-1 shadow-xl">
+                                <a href="{{ route('resumes.export', $resume) }}" class="block rounded-md px-3 py-2 text-sm font-bold text-neutral-700 hover:bg-black/5">Export as PDF</a>
+                                <a href="{{ route('resumes.export-word', $resume) }}" class="block rounded-md px-3 py-2 text-sm font-bold text-neutral-700 hover:bg-black/5">Export as Word</a>
+                                <a href="{{ route('resumes.export-image', $resume) }}" class="block rounded-md px-3 py-2 text-sm font-bold text-neutral-700 hover:bg-black/5">Export as Image</a>
+                            </div>
+                        </div>
                     </div>
                 </article>
             @empty

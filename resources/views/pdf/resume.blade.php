@@ -6,7 +6,7 @@
     $dark = data_get($settings, 'dark', '#111827');
     $surface = data_get($settings, 'surface', '#ffffff');
     $title = $resume->professional_title ?: $resume->user->professional_title;
-    $contact = collect([$resume->user->email, $resume->user->location])->filter()->map(fn (string $item): string => e($item))->join(' &middot; ');
+    $contact = collect([$resume->user->email, $resume->user->location])->filter()->join(' | ');
     $hasSidebar = in_array($style, ['sidebar', 'soft-sidebar', 'right-rail', 'technical'], true);
     $usesDarkSidebar = in_array($style, ['sidebar', 'right-rail', 'technical'], true);
     $sidebarBackground = $usesDarkSidebar ? $dark : $soft;
@@ -39,16 +39,16 @@
             .band { background: {{ in_array($style, ['dark-header'], true) ? $dark : $soft }}; padding: 34pt 40pt; }
             .band h1 { color: {{ in_array($style, ['dark-header'], true) ? '#ffffff' : '#111827' }}; }
             .band .muted { color: {{ in_array($style, ['dark-header'], true) ? '#d1d5db' : '#4b5563' }}; }
-            .side-fill { background: {{ $sidebarBackground }}; bottom: 0; position: fixed; top: 0; width: 202pt; z-index: 0; }
-            .side-fill-left { left: 0; }
-            .side-fill-right { right: 0; }
-            .content-table { border-collapse: collapse; position: relative; table-layout: fixed; width: 100%; z-index: 1; }
-            .content-table td { vertical-align: top; }
-            .side { background: transparent; color: {{ $sidebarText }}; padding: 40pt 26pt; width: 202pt; }
-            .side h1 { color: {{ $sidebarText }}; font-size: 21px; }
-            .side h2 { color: {{ $sidebarText }}; opacity: 0.78; }
-            .side .muted { color: {{ $sidebarText }}; opacity: 0.75; }
-            .main { padding: 40pt 36pt; width: 393.28pt; }
+            .sidebar-panel { background: {{ $sidebarBackground }}; bottom: 0; color: {{ $sidebarText }}; position: fixed; top: 0; width: 34%; z-index: 1; }
+            .sidebar-panel-left { left: 0; }
+            .sidebar-panel-right { right: 0; }
+            .side-content { padding: 40pt 24pt; }
+            .sidebar-panel h1 { color: {{ $sidebarText }}; font-size: 21px; }
+            .sidebar-panel h2 { color: {{ $sidebarText }}; opacity: 0.78; }
+            .sidebar-panel .muted { color: {{ $sidebarText }}; opacity: 0.75; }
+            .sidebar-main { bottom: 0; padding: 40pt 26pt; position: absolute; top: 0; z-index: 2; }
+            .sidebar-main-left { left: 34%; right: 0; }
+            .sidebar-main-right { left: 0; right: 34%; }
             .pill { border: 1px solid {{ $usesDarkSidebar ? 'rgba(255,255,255,0.35)' : $accent }}; border-radius: 10px; display: inline-block; margin: 0 4px 5px 0; padding: 3px 7px; }
             .two-col { border-collapse: collapse; width: 100%; }
             .two-col .left { padding-right: 22px; width: 66%; }
@@ -60,121 +60,93 @@
     <body>
         <div class="page">
         @if ($hasSidebar)
-            <div class="side-fill {{ data_get($settings, 'sidebar') === 'right' ? 'side-fill-right' : 'side-fill-left' }}"></div>
-            <table class="content-table">
-                <tr>
+            <aside class="sidebar-panel {{ data_get($settings, 'sidebar') === 'right' ? 'sidebar-panel-right' : 'sidebar-panel-left' }}">
+                <div class="side-content">
                     @if (data_get($settings, 'sidebar') !== 'right')
-                        <td class="side">
-                            @if ($profileImageSource)
-                                <img class="avatar" src="{{ $profileImageSource }}" alt="">
-                            @endif
-                            <h1>{{ $resume->user->name }}</h1>
-                            @if ($title)
-                                <p style="margin-top: 8px;"><strong>{{ $title }}</strong></p>
-                            @endif
-                            <h2>Contact</h2>
-                            <p class="muted">{!! $contact !!}</p>
-                            @if ($resume->skills->isNotEmpty())
-                                <h2>Skills</h2>
-                                <p>
-                                    @foreach ($resume->skills->take(14) as $skill)
-                                        <span class="pill">{{ $skill->name }}</span>
-                                    @endforeach
-                                </p>
-                            @endif
-                            @if ($resume->educations->isNotEmpty())
-                                <h2>Education</h2>
-                                @foreach ($resume->educations->take(2) as $education)
-                                    <p><strong>{{ $education->school }}</strong><br><span class="muted">{{ $education->degree }} {{ $education->field }}</span></p>
-                                @endforeach
-                            @endif
-                            @if ($resume->languages->isNotEmpty())
-                                <h2>Languages</h2>
-                                @foreach ($resume->languages as $language)
-                                    <p>{{ $language->name }}{{ $language->proficiency ? ' - '.$language->proficiency : '' }}</p>
-                                @endforeach
-                            @endif
-                        </td>
+                        @if ($profileImageSource)
+                            <img class="avatar" src="{{ $profileImageSource }}" alt="">
+                        @endif
+                        <h1>{{ $resume->user->name }}</h1>
+                        @if ($title)
+                            <p style="margin-top: 8px;"><strong>{{ $title }}</strong></p>
+                        @endif
                     @endif
-
-                    <td class="main">
-                        @if (data_get($settings, 'sidebar') === 'right')
-                            <h1>{{ $resume->user->name }}</h1>
-                            @if ($title)
-                                <p class="accent"><strong>{{ $title }}</strong></p>
-                            @endif
-                            <p class="muted">{!! $contact !!}</p>
-                        @endif
-                        @if ($resume->professional_summary)
-                            <h2 class="rule">Profile</h2>
-                            <p>{{ $resume->professional_summary }}</p>
-                        @endif
-                        @if ($resume->experiences->isNotEmpty())
-                            <h2 class="rule">Work Experience</h2>
-                            @foreach ($resume->experiences as $experience)
-                                <div class="item">
-                                    <h3>{{ $experience->position }}, {{ $experience->company }}</h3>
-                                    <p class="muted">{{ $experience->start_date }} - {{ $experience->end_date ?: 'Present' }}{{ $experience->location ? ' &middot; '.$experience->location : '' }}</p>
-                                    <p>{{ $experience->description }}</p>
-                                    @if ($experience->bullets)
-                                        <ul>
-                                            @foreach ($experience->bullets as $bullet)
-                                                <li>{{ $bullet }}</li>
-                                            @endforeach
-                                        </ul>
-                                    @endif
-                                </div>
+                    <h2>Contact</h2>
+                    <p class="muted">{{ $contact }}</p>
+                    @if ($resume->skills->isNotEmpty())
+                        <h2>Skills</h2>
+                        <p>
+                            @foreach ($resume->skills->take(14) as $skill)
+                                <span class="pill">{{ $skill->name }}</span>
                             @endforeach
-                        @endif
-                        @if ($resume->projects->isNotEmpty())
-                            <h2 class="rule">Projects</h2>
-                            @foreach ($resume->projects as $project)
-                                <div class="item">
-                                    <h3>{{ $project->name }}{{ $project->role ? ' - '.$project->role : '' }}</h3>
-                                    <p>{{ $project->description }}</p>
-                                </div>
-                            @endforeach
-                        @endif
-                        @if ($resume->certifications->isNotEmpty())
-                            <h2 class="rule">Certifications</h2>
-                            @foreach ($resume->certifications as $certification)
-                                <p><strong>{{ $certification->name }}</strong>{{ $certification->issuer ? ' - '.$certification->issuer : '' }}</p>
-                            @endforeach
-                        @endif
-                    </td>
-
-                    @if (data_get($settings, 'sidebar') === 'right')
-                        <td class="side">
-                            @if ($profileImageSource)
-                                <img class="avatar" src="{{ $profileImageSource }}" alt="">
-                            @endif
-                            <h2>Contact</h2>
-                            <p class="muted">{!! $contact !!}</p>
-                            @if ($resume->skills->isNotEmpty())
-                                <h2>Skills</h2>
-                                <p>
-                                    @foreach ($resume->skills->take(14) as $skill)
-                                        <span class="pill">{{ $skill->name }}</span>
-                                    @endforeach
-                                </p>
-                            @endif
-                            @if ($resume->educations->isNotEmpty())
-                                <h2>Education</h2>
-                                @foreach ($resume->educations->take(2) as $education)
-                                    <p><strong>{{ $education->school }}</strong><br><span class="muted">{{ $education->degree }} {{ $education->field }}</span></p>
-                                @endforeach
-                            @endif
-                        </td>
+                        </p>
                     @endif
-                </tr>
-            </table>
+                    @if ($resume->educations->isNotEmpty())
+                        <h2>Education</h2>
+                        @foreach ($resume->educations->take(2) as $education)
+                            <p><strong>{{ $education->school }}</strong><br><span class="muted">{{ $education->degree }} {{ $education->field }}</span></p>
+                        @endforeach
+                    @endif
+                    @if ($resume->languages->isNotEmpty())
+                        <h2>Languages</h2>
+                        @foreach ($resume->languages as $language)
+                            <p>{{ $language->name }}{{ $language->proficiency ? ' - '.$language->proficiency : '' }}</p>
+                        @endforeach
+                    @endif
+                </div>
+            </aside>
+            <main class="sidebar-main {{ data_get($settings, 'sidebar') === 'right' ? 'sidebar-main-right' : 'sidebar-main-left' }}">
+                @if (data_get($settings, 'sidebar') === 'right')
+                    <h1>{{ $resume->user->name }}</h1>
+                    @if ($title)
+                        <p class="accent"><strong>{{ $title }}</strong></p>
+                    @endif
+                    <p class="muted">{{ $contact }}</p>
+                @endif
+                @if ($resume->professional_summary)
+                    <h2 class="rule">Profile</h2>
+                    <p>{{ $resume->professional_summary }}</p>
+                @endif
+                @if ($resume->experiences->isNotEmpty())
+                    <h2 class="rule">Work Experience</h2>
+                    @foreach ($resume->experiences as $experience)
+                        <div class="item">
+                            <h3>{{ $experience->position }}, {{ $experience->company }}</h3>
+                            <p class="muted">{{ $experience->start_date }} - {{ $experience->end_date ?: 'Present' }}{{ $experience->location ? ' | '.$experience->location : '' }}</p>
+                            <p>{{ $experience->description }}</p>
+                            @if ($experience->bullets)
+                                <ul>
+                                    @foreach ($experience->bullets as $bullet)
+                                        <li>{{ $bullet }}</li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </div>
+                    @endforeach
+                @endif
+                @if ($resume->projects->isNotEmpty())
+                    <h2 class="rule">Projects</h2>
+                    @foreach ($resume->projects as $project)
+                        <div class="item">
+                            <h3>{{ $project->name }}{{ $project->role ? ' - '.$project->role : '' }}</h3>
+                            <p>{{ $project->description }}</p>
+                        </div>
+                    @endforeach
+                @endif
+                @if ($resume->certifications->isNotEmpty())
+                    <h2 class="rule">Certifications</h2>
+                    @foreach ($resume->certifications as $certification)
+                        <p><strong>{{ $certification->name }}</strong>{{ $certification->issuer ? ' - '.$certification->issuer : '' }}</p>
+                    @endforeach
+                @endif
+            </main>
         @elseif (in_array($style, ['top-band', 'photo-band', 'feature', 'dark-header', 'stripe', 'edge'], true))
             <header class="band">
                 <h1>{{ $resume->user->name }}</h1>
                 @if ($title)
                     <p class="accent"><strong>{{ $title }}</strong></p>
                 @endif
-                <p class="muted">{!! $contact !!}</p>
+                <p class="muted">{{ $contact }}</p>
             </header>
             <main class="sheet">
                 <table class="two-col">
@@ -204,7 +176,7 @@
                         <td class="right">
                             @if ($resume->skills->isNotEmpty())
                                 <h2>Skills</h2>
-                                <p class="skills">{{ $resume->skills->pluck('name')->join(' &middot; ') }}</p>
+                                <p class="skills">{{ $resume->skills->pluck('name')->join(' | ') }}</p>
                             @endif
                             @if ($resume->educations->isNotEmpty())
                                 <h2>Education</h2>
@@ -228,7 +200,7 @@
                 @if ($title)
                     <p class="accent"><strong>{{ $title }}</strong></p>
                 @endif
-                <p class="muted">{!! $contact !!}</p>
+                <p class="muted">{{ $contact }}</p>
                 @if ($resume->professional_summary)
                     <h2 class="rule">About Me</h2>
                     <p>{{ $resume->professional_summary }}</p>
@@ -245,7 +217,7 @@
                 @endif
                 @if ($resume->skills->isNotEmpty())
                     <h2 class="rule">Skills</h2>
-                    <p class="skills">{{ $resume->skills->pluck('name')->join(' &middot; ') }}</p>
+                    <p class="skills">{{ $resume->skills->pluck('name')->join(' | ') }}</p>
                 @endif
                 @if ($resume->educations->isNotEmpty())
                     <h2 class="rule">Education</h2>
@@ -260,7 +232,7 @@
                 @if ($title)
                     <p class="accent"><strong>{{ $title }}</strong></p>
                 @endif
-                <p class="muted">{!! $contact !!}</p>
+                <p class="muted">{{ $contact }}</p>
 
                 @if ($resume->professional_summary)
                     <h2 class="rule">Summary</h2>
@@ -269,7 +241,7 @@
 
                 @if ($resume->skills->isNotEmpty())
                     <h2 class="rule">Skills</h2>
-                    <p class="skills">{{ $resume->skills->pluck('name')->join(' &middot; ') }}</p>
+                    <p class="skills">{{ $resume->skills->pluck('name')->join(' | ') }}</p>
                 @endif
 
                 @if ($resume->experiences->isNotEmpty())
@@ -277,7 +249,7 @@
                     @foreach ($resume->experiences as $experience)
                         <div class="item">
                             <h3>{{ $experience->position }}, {{ $experience->company }}</h3>
-                            <p class="muted">{{ $experience->start_date }} - {{ $experience->end_date ?: 'Present' }}{{ $experience->location ? ' &middot; '.$experience->location : '' }}</p>
+                            <p class="muted">{{ $experience->start_date }} - {{ $experience->end_date ?: 'Present' }}{{ $experience->location ? ' | '.$experience->location : '' }}</p>
                             <p>{{ $experience->description }}</p>
                             @if ($experience->bullets)
                                 <ul>

@@ -201,7 +201,12 @@
     <footer class="border-t border-black/10 bg-white px-5 py-8">
         <div class="mx-auto flex max-w-7xl flex-col gap-3 text-sm text-neutral-500 md:flex-row md:items-center md:justify-between">
             <p>&copy; {{ now()->year }} AI Resume & Job Application Assistant</p>
-            <p>Built for factual, job-specific career documents.</p>
+            <div class="flex flex-wrap gap-x-5 gap-y-2">
+                <a href="{{ route('legal.show', 'terms') }}" class="hover:text-neutral-950">Terms</a>
+                <a href="{{ route('legal.show', 'privacy') }}" class="hover:text-neutral-950">Privacy</a>
+                <a href="{{ route('legal.show', 'subscription-policy') }}" class="hover:text-neutral-950">Subscription policy</a>
+                <a href="{{ route('legal.show', 'refund-policy') }}" class="hover:text-neutral-950">Refund policy</a>
+            </div>
         </div>
     </footer>
 @endsection

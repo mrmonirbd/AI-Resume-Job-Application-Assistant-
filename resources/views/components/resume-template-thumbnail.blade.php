@@ -3,6 +3,8 @@
 @php
     $settings = $template->settings ?? [];
     $style = data_get($settings, 'style', 'classic');
+    $slug = $template->slug ?: str($template->name)->slug()->toString();
+    $variant = $slug;
     $header = data_get($settings, 'header', 'compact');
     $accent = $template->accent_color ?: '#2563eb';
     $soft = data_get($settings, 'soft', '#eef2ff');
@@ -54,41 +56,125 @@
 
 <div
     data-template-style="{{ $style }}"
+    data-template-variant="{{ $variant }}"
     data-template-layout="{{ $template->layout }}"
     {{ $attributes->merge(['class' => "relative overflow-hidden rounded-lg border border-black/10 bg-white shadow-sm {$heightClass}"]) }}
     style="font-family: {{ $template->font_family }}, Arial, sans-serif; background: {{ $surface }};"
 >
     @switch($style)
         @case('sidebar')
-            <div class="grid h-full grid-cols-[0.82fr_1.42fr]">
-                <aside class="p-4" style="background: {{ $dark }}; color: #ffffff;">
-                    <x-demo-profile-image class="h-14 w-14 border-4 border-white/80" />
-                    <p class="mt-4 {{ $section }} font-black uppercase tracking-[0.16em] opacity-80">Contact</p>
-                    <p class="{{ $tiny }} mt-2 opacity-75">demo@example.com<br>Dhaka, BD<br>+880 1700 000</p>
-                    <p class="mt-4 {{ $section }} font-black uppercase tracking-[0.16em] opacity-80">Skills</p>
-                    <div class="mt-2 space-y-1.5">
-                        @foreach (['Risk', 'Finance', 'Reports', 'Excel'] as $skill)
-                            <div class="h-1.5 rounded-full bg-white/35"></div>
-                        @endforeach
-                    </div>
-                </aside>
-                <main class="p-4">
-                    <h3 class="text-[13px] font-black uppercase tracking-wide">{{ $name }}</h3>
-                    <p class="{{ $tiny }} mt-1 font-bold" style="color: {{ $accent }};">{{ $role }}</p>
-                    <p class="mt-4 {{ $section }} font-black uppercase tracking-[0.16em]">Profile</p>
-                    <p class="{{ $tiny }} mt-1 text-neutral-600">{{ $demoLines[0] }}</p>
-                    <div class="mt-4 space-y-3">
-                        @foreach (['Senior Analyst', 'Credit Officer', 'Report Associate'] as $job)
-                            <section>
-                                <p class="{{ $tiny }} font-black">{{ $job }}</p>
-                                <p class="{{ $tiny }} text-neutral-500">2021 - Present</p>
-                                <div class="mt-1.5 h-1.5 w-full rounded-full bg-neutral-200"></div>
-                                <div class="mt-1 h-1.5 w-8/12 rounded-full bg-neutral-200"></div>
-                            </section>
-                        @endforeach
-                    </div>
-                </main>
-            </div>
+            @if ($slug === 'executive-ledger')
+                <div class="grid h-full grid-cols-[0.78fr_1.48fr]">
+                    <aside class="p-4" style="background: {{ $dark }}; color: #ffffff;">
+                        <x-demo-profile-image class="h-14 w-14 rounded-md border-2 border-white/80" />
+                        <p class="mt-5 {{ $section }} font-black uppercase tracking-[0.18em] opacity-80">Ledger</p>
+                        <div class="mt-2 space-y-2">
+                            @foreach (['Revenue', 'Risk', 'Budget'] as $item)
+                                <div class="grid grid-cols-[1fr_1.2fr] gap-1">
+                                    <span class="h-2 rounded-sm bg-white/25"></span>
+                                    <span class="h-2 rounded-sm bg-white/45"></span>
+                                </div>
+                            @endforeach
+                        </div>
+                        <p class="mt-5 {{ $section }} font-black uppercase tracking-[0.18em] opacity-80">Contact</p>
+                        <p class="{{ $tiny }} mt-2 opacity-75">demo@example.com<br>Dhaka, BD</p>
+                    </aside>
+                    <main class="p-5">
+                        <h3 class="text-[13px] font-black uppercase tracking-wide">{{ $name }}</h3>
+                        <p class="{{ $tiny }} mt-1 font-bold" style="color: {{ $accent }};">{{ $role }}</p>
+                        <div class="mt-5 space-y-3">
+                            @foreach (['Executive Summary', 'Financial Control', 'Board Reporting', 'Education'] as $item)
+                                <section class="grid grid-cols-[0.72fr_1.2fr] gap-3 border-b border-black/10 pb-2">
+                                    <p class="{{ $section }} font-black uppercase tracking-[0.14em]">{{ $item }}</p>
+                                    <p class="{{ $tiny }} text-neutral-600">{{ $demoLines[$loop->index % 3] }}</p>
+                                </section>
+                            @endforeach
+                        </div>
+                    </main>
+                </div>
+            @elseif ($slug === 'slate-manager')
+                <div class="grid h-full grid-cols-[0.9fr_1.35fr]">
+                    <aside class="p-4 text-center" style="background: {{ $dark }}; color: #ffffff;">
+                        <div class="rounded-sm bg-white/10 p-2">
+                            <x-demo-profile-image class="mx-auto h-16 w-16 border-4 border-white/80" />
+                        </div>
+                        <p class="mt-4 {{ $section }} font-black uppercase tracking-[0.16em] opacity-80">Manager</p>
+                        <div class="mt-3 space-y-2">
+                            @foreach (['Planning', 'Budgets', 'Teams', 'Reports'] as $item)
+                                <p class="{{ $tiny }} rounded-sm bg-white/15 px-2 py-1 text-left">{{ $item }}</p>
+                            @endforeach
+                        </div>
+                    </aside>
+                    <main class="p-5">
+                        <h3 class="text-[13px] font-black uppercase tracking-wide">{{ $name }}</h3>
+                        <p class="{{ $tiny }} mt-1 font-bold" style="color: {{ $accent }};">{{ $role }}</p>
+                        <div class="mt-5 space-y-4">
+                            @foreach (['Profile', 'Operations', 'People', 'Education'] as $item)
+                                <section class="border-l-4 pl-3" style="border-color: {{ $loop->first ? $accent : '#d4d4d8' }};">
+                                    <p class="{{ $section }} font-black uppercase tracking-[0.14em]">{{ $item }}</p>
+                                    <p class="{{ $tiny }} mt-1 text-neutral-600">{{ $demoLines[$loop->index % 3] }}</p>
+                                </section>
+                            @endforeach
+                        </div>
+                    </main>
+                </div>
+            @elseif ($slug === 'marketing-sidebar')
+                <div class="grid h-full grid-cols-[0.72fr_1.5fr]">
+                    <aside class="p-4" style="background: {{ $dark }}; color: #ffffff;">
+                        <x-demo-profile-image class="h-16 w-16 border-4 border-white/80" />
+                        <p class="mt-4 {{ $section }} font-black uppercase tracking-[0.16em] opacity-80">Campaigns</p>
+                        <div class="mt-3 space-y-2">
+                            @foreach ([90, 76, 64, 82] as $width)
+                                <div class="h-2 rounded-full bg-white/20">
+                                    <div class="h-2 rounded-full bg-white/65" style="width: {{ $width }}%;"></div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </aside>
+                    <main class="p-5">
+                        <h3 class="text-[13px] font-black uppercase tracking-wide">{{ $name }}</h3>
+                        <p class="{{ $tiny }} mt-1 font-bold" style="color: {{ $accent }};">{{ $role }}</p>
+                        <div class="mt-5 grid grid-cols-2 gap-3">
+                            @foreach (['Profile', 'Brand Growth', 'Market Research', 'Tools', 'Education', 'Awards'] as $item)
+                                <section>
+                                    <p class="{{ $section }} font-black uppercase tracking-[0.14em]">{{ $item }}</p>
+                                    <p class="{{ $tiny }} mt-1 text-neutral-600">{{ $demoLines[$loop->index % 3] }}</p>
+                                </section>
+                            @endforeach
+                        </div>
+                    </main>
+                </div>
+            @else
+                <div class="grid h-full grid-cols-[0.82fr_1.42fr]">
+                    <aside class="p-4" style="background: {{ $dark }}; color: #ffffff;">
+                        <x-demo-profile-image class="h-14 w-14 border-4 border-white/80" />
+                        <p class="mt-4 {{ $section }} font-black uppercase tracking-[0.16em] opacity-80">Contact</p>
+                        <p class="{{ $tiny }} mt-2 opacity-75">demo@example.com<br>Dhaka, BD<br>+880 1700 000</p>
+                        <p class="mt-4 {{ $section }} font-black uppercase tracking-[0.16em] opacity-80">Skills</p>
+                        <div class="mt-2 space-y-1.5">
+                            @foreach (['Risk', 'Finance', 'Reports', 'Excel'] as $skill)
+                                <div class="h-1.5 rounded-full bg-white/35"></div>
+                            @endforeach
+                        </div>
+                    </aside>
+                    <main class="p-4">
+                        <h3 class="text-[13px] font-black uppercase tracking-wide">{{ $name }}</h3>
+                        <p class="{{ $tiny }} mt-1 font-bold" style="color: {{ $accent }};">{{ $role }}</p>
+                        <p class="mt-4 {{ $section }} font-black uppercase tracking-[0.16em]">Profile</p>
+                        <p class="{{ $tiny }} mt-1 text-neutral-600">{{ $demoLines[0] }}</p>
+                        <div class="mt-4 space-y-3">
+                            @foreach (['Senior Analyst', 'Credit Officer', 'Report Associate'] as $job)
+                                <section>
+                                    <p class="{{ $tiny }} font-black">{{ $job }}</p>
+                                    <p class="{{ $tiny }} text-neutral-500">2021 - Present</p>
+                                    <div class="mt-1.5 h-1.5 w-full rounded-full bg-neutral-200"></div>
+                                    <div class="mt-1 h-1.5 w-8/12 rounded-full bg-neutral-200"></div>
+                                </section>
+                            @endforeach
+                        </div>
+                    </main>
+                </div>
+            @endif
             @break
 
         @case('soft-sidebar')
@@ -180,32 +266,62 @@
 
         @case('top-band')
         @case('photo-band')
-            <div class="h-full">
-                <header class="flex h-24 items-center gap-4 px-5" style="background: {{ $soft }};">
-                    <x-demo-profile-image class="h-16 w-16 border-4 border-white" />
-                    <div class="min-w-0">
-                        <h3 class="truncate text-[14px] font-black uppercase tracking-wide">{{ $name }}</h3>
-                        <p class="{{ $tiny }} mt-1 font-bold" style="color: {{ $accent }};">{{ $role }}</p>
-                        <p class="{{ $tiny }} mt-1 text-neutral-500">demo@example.com · Dhaka</p>
-                    </div>
-                </header>
-                <div class="grid h-[calc(100%-6rem)] grid-cols-[1.15fr_0.85fr] gap-4 p-5">
-                    <main class="space-y-3">
-                        @foreach (['About Me', 'Experience', 'Education'] as $item)
-                            <section>
-                                <p class="{{ $section }} font-black uppercase tracking-[0.16em]">{{ $item }}</p>
-                                <p class="{{ $tiny }} mt-1 text-neutral-600">{{ $demoLines[$loop->index] }}</p>
-                            </section>
-                        @endforeach
+            @if ($slug === 'rose-designer')
+                <div class="h-full">
+                    <header class="grid h-24 grid-cols-[0.72fr_1.4fr]" style="background: {{ $soft }};">
+                        <div class="flex items-center justify-center">
+                            <x-demo-profile-image class="h-16 w-16 border-4 border-white" />
+                        </div>
+                        <div class="flex min-w-0 flex-col justify-center pr-5">
+                            <h3 class="truncate text-[14px] font-black uppercase tracking-wide">{{ $name }}</h3>
+                            <p class="{{ $tiny }} mt-1 font-bold" style="color: {{ $accent }};">{{ $role }}</p>
+                            <p class="{{ $tiny }} mt-1 text-neutral-500">portfolio@example.com</p>
+                        </div>
+                    </header>
+                    <main class="grid h-[calc(100%-6rem)] grid-cols-[1fr_0.82fr] gap-5 p-5">
+                        <section class="space-y-3">
+                            @foreach (['About Me', 'Experience', 'Education'] as $item)
+                                <div>
+                                    <p class="{{ $section }} font-black uppercase tracking-[0.16em]">{{ $item }}</p>
+                                    <p class="{{ $tiny }} mt-1 text-neutral-600">{{ $demoLines[$loop->index] }}</p>
+                                </div>
+                            @endforeach
+                        </section>
+                        <aside class="space-y-2">
+                            @foreach (['Risk', 'Finance', 'Reports', 'Excel'] as $skill)
+                                <p class="{{ $tiny }} rounded-r-full border-l-4 px-2 py-1" style="border-color: {{ $accent }}; background: {{ $loop->odd ? $soft : '#f1f5f9' }};">{{ $skill }}</p>
+                            @endforeach
+                        </aside>
                     </main>
-                    <aside class="space-y-2">
-                        <p class="{{ $section }} font-black uppercase tracking-[0.16em]">Skills</p>
-                        @foreach (['Risk', 'Finance', 'Reports', 'Excel'] as $skill)
-                            <p class="{{ $tiny }} rounded-sm px-2 py-1" style="background: {{ $loop->odd ? $soft : '#f1f5f9' }};">{{ $skill }}</p>
-                        @endforeach
-                    </aside>
                 </div>
-            </div>
+            @else
+                <div class="h-full">
+                    <header class="flex h-24 items-center gap-4 border-b-4 px-5" style="background: {{ $soft }}; border-color: {{ $accent }};">
+                        <x-demo-profile-image class="h-16 w-16 border-4 border-white" />
+                        <div class="min-w-0">
+                            <h3 class="truncate text-[14px] font-black uppercase tracking-wide">{{ $name }}</h3>
+                            <p class="{{ $tiny }} mt-1 font-bold" style="color: {{ $accent }};">{{ $role }}</p>
+                            <p class="{{ $tiny }} mt-1 text-neutral-500">demo@example.com &middot; Dhaka</p>
+                        </div>
+                    </header>
+                    <div class="grid h-[calc(100%-6rem)] grid-cols-[1.15fr_0.85fr] gap-4 p-5">
+                        <main class="space-y-3">
+                            @foreach (['About Me', 'Experience', 'Education'] as $item)
+                                <section>
+                                    <p class="{{ $section }} font-black uppercase tracking-[0.16em]">{{ $item }}</p>
+                                    <p class="{{ $tiny }} mt-1 text-neutral-600">{{ $demoLines[$loop->index] }}</p>
+                                </section>
+                            @endforeach
+                        </main>
+                        <aside class="space-y-2">
+                            <p class="{{ $section }} font-black uppercase tracking-[0.16em]">Skills</p>
+                            @foreach (['Risk', 'Finance', 'Reports', 'Excel'] as $skill)
+                                <p class="{{ $tiny }} rounded-sm px-2 py-1" style="background: {{ $loop->odd ? $soft : '#f1f5f9' }};">{{ $skill }}</p>
+                            @endforeach
+                        </aside>
+                    </div>
+                </div>
+            @endif
             @break
 
         @case('feature')
@@ -481,40 +597,90 @@
             @break
 
         @case('academic')
-            <div class="h-full p-5">
-                <header>
-                    <h3 class="text-[13px] font-black">{{ $name }}</h3>
-                    <p class="{{ $tiny }} mt-1 text-neutral-500">Research Assistant · demo@example.com</p>
-                </header>
-                <main class="mt-4 space-y-3">
-                    @foreach (['Education', 'Research', 'Publications', 'Teaching', 'References'] as $item)
-                        <section>
-                            <div class="flex items-center justify-between border-b border-neutral-300 pb-1">
-                                <p class="{{ $section }} font-black uppercase tracking-[0.14em]">{{ $item }}</p>
-                                <p class="{{ $tiny }} text-neutral-400">2020 - 2024</p>
-                            </div>
-                            <p class="{{ $tiny }} mt-1 text-neutral-600">{{ $demoLines[$loop->index % 3] }}</p>
-                        </section>
-                    @endforeach
-                </main>
-            </div>
+            @if ($slug === 'graduate-focus')
+                <div class="h-full p-5">
+                    <header class="border-b-2 pb-3" style="border-color: {{ $accent }};">
+                        <h3 class="text-[13px] font-black">{{ $name }}</h3>
+                        <p class="{{ $tiny }} mt-1 text-neutral-500">Graduate Analyst &middot; demo@example.com</p>
+                    </header>
+                    <main class="mt-4 space-y-3">
+                        @foreach (['Education', 'Capstone', 'Internship', 'Campus Leadership', 'References'] as $item)
+                            <section class="grid grid-cols-[1.15fr_0.42fr] gap-3">
+                                <div>
+                                    <p class="{{ $section }} font-black uppercase tracking-[0.14em]">{{ $item }}</p>
+                                    <p class="{{ $tiny }} mt-1 text-neutral-600">{{ $demoLines[$loop->index % 3] }}</p>
+                                </div>
+                                <p class="{{ $tiny }} text-right text-neutral-400">2020<br>2024</p>
+                            </section>
+                        @endforeach
+                    </main>
+                </div>
+            @else
+                <div class="h-full p-5">
+                    <header class="text-center">
+                        <h3 class="text-[13px] font-black">{{ $name }}</h3>
+                        <p class="{{ $tiny }} mt-1 text-neutral-500">Research Assistant &middot; demo@example.com</p>
+                    </header>
+                    <main class="mt-5 space-y-3">
+                        @foreach (['Publications', 'Research', 'Teaching', 'Education', 'References'] as $item)
+                            <section>
+                                <div class="flex items-center justify-between border-b border-neutral-300 pb-1">
+                                    <p class="{{ $section }} font-black uppercase tracking-[0.14em]">{{ $item }}</p>
+                                    <p class="{{ $tiny }} text-neutral-400">2020 - 2024</p>
+                                </div>
+                                <p class="{{ $tiny }} mt-1 text-neutral-600">{{ $demoLines[$loop->index % 3] }}</p>
+                            </section>
+                        @endforeach
+                    </main>
+                </div>
+            @endif
             @break
 
         @default
-            <div class="h-full {{ $pagePadding }}">
-                <header @class(['text-center' => in_array($header, ['centered', 'small-center'], true)])>
-                    <h3 class="{{ $nameSize }} font-black uppercase tracking-wide">{{ $name }}</h3>
-                    <p class="{{ $tiny }} mt-1 font-bold" style="color: {{ $accent }};">{{ $role }}</p>
-                    <p class="{{ $tiny }} mt-1 text-neutral-500">demo@example.com · Dhaka</p>
-                </header>
-                <main class="{{ $preview ? 'mt-8 space-y-5' : 'mt-5 space-y-3' }}">
-                    @foreach ($fullSections as $item)
-                        <section>
-                            <p class="{{ $section }} font-black uppercase tracking-[0.16em]">{{ $item }}</p>
-                            <p class="{{ $tiny }} mt-1 text-neutral-600">{{ $demoLines[$loop->index % 3] }}</p>
+            @if ($slug === 'operator-compact')
+                <div class="h-full p-5">
+                    <header class="grid grid-cols-[1.2fr_0.72fr] gap-4 border-b border-neutral-300 pb-3">
+                        <div>
+                            <h3 class="text-[13px] font-black uppercase tracking-wide">{{ $name }}</h3>
+                            <p class="{{ $tiny }} mt-1 font-bold" style="color: {{ $accent }};">Operations Lead</p>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="h-2 rounded-full bg-neutral-200"></div>
+                            <div class="h-2 w-8/12 rounded-full bg-neutral-200"></div>
+                        </div>
+                    </header>
+                    <main class="mt-4 grid grid-cols-[0.82fr_1.2fr] gap-4">
+                        <aside class="space-y-2">
+                            @foreach (['Process', 'Volume', 'Quality', 'SLA'] as $item)
+                                <p class="{{ $tiny }} rounded-sm px-2 py-1" style="background: {{ $soft }};">{{ $item }}</p>
+                            @endforeach
+                        </aside>
+                        <section class="space-y-3">
+                            @foreach (['Summary', 'Operations', 'Reporting', 'Education'] as $item)
+                                <div>
+                                    <p class="{{ $section }} font-black uppercase tracking-[0.14em]">{{ $item }}</p>
+                                    <p class="{{ $tiny }} mt-1 text-neutral-600">{{ $demoLines[$loop->index % 3] }}</p>
+                                </div>
+                            @endforeach
                         </section>
-                    @endforeach
-                </main>
-            </div>
+                    </main>
+                </div>
+            @else
+                <div class="h-full {{ $pagePadding }}">
+                    <header @class(['text-center' => in_array($header, ['centered', 'small-center'], true)])>
+                        <h3 class="{{ $nameSize }} font-black uppercase tracking-wide">{{ $name }}</h3>
+                        <p class="{{ $tiny }} mt-1 font-bold" style="color: {{ $accent }};">{{ $role }}</p>
+                        <p class="{{ $tiny }} mt-1 text-neutral-500">demo@example.com &middot; Dhaka</p>
+                    </header>
+                    <main class="{{ $preview ? 'mt-8 space-y-5' : 'mt-5 space-y-3' }}">
+                        @foreach ($fullSections as $item)
+                            <section>
+                                <p class="{{ $section }} font-black uppercase tracking-[0.16em]">{{ $item }}</p>
+                                <p class="{{ $tiny }} mt-1 text-neutral-600">{{ $demoLines[$loop->index % 3] }}</p>
+                            </section>
+                        @endforeach
+                    </main>
+                </div>
+            @endif
     @endswitch
 </div>

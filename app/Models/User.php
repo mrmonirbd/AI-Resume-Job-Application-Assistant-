@@ -6,6 +6,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -26,6 +27,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'career_goal',
         'is_admin',
         'onboarding_completed_at',
+        'concept_id',
+        'crm_customer_id',
+        'crm_subscription_id',
+        'crm_web_user_id',
+        'domain_name',
+        'crm_profile',
     ];
 
     /**
@@ -40,6 +47,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'is_admin' => 'boolean',
             'onboarding_completed_at' => 'datetime',
             'password' => 'hashed',
+            'crm_profile' => 'array',
         ];
     }
 
@@ -71,5 +79,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function subscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class);
+    }
+
+    public function concept(): BelongsTo
+    {
+        return $this->belongsTo(Concept::class);
     }
 }

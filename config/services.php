@@ -44,4 +44,18 @@ return [
         'retry_sleep_ms' => env('DEEPSEEK_RETRY_SLEEP_MS', 350),
     ],
 
+    'crm' => [
+        'timeout' => env('CRM_TIMEOUT', 10),
+        'retries' => env('CRM_RETRIES', 1),
+        'retry_sleep_ms' => env('CRM_RETRY_SLEEP_MS', 200),
+        'default_domain' => env('CONCEPT_DOMAIN'),
+        'default_name' => env('CONCEPT_NAME', 'AI Resume Assistant'),
+        'api_url' => env('CRM_API_URL'),
+        'api_key' => env('CRM_API_KEY'),
+        'service_id' => env('CRM_SERVICE_ID'),
+        'product_id' => env('CRM_PRODUCT_ID'),
+        'support_email' => env('SUPPORT_EMAIL'),
+        'support_phone' => env('SUPPORT_PHONE'),
+    ],
+
 ];

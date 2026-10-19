@@ -47,9 +47,34 @@ class ResumeTemplateTest extends TestCase
             ->assertSee('Technical Grid')
             ->assertSee('data-template-style="timeline"', false)
             ->assertSee('data-template-style="technical"', false)
-            ->assertSee('data-template-style="soft-sidebar"', false);
+            ->assertSee('data-template-style="soft-sidebar"', false)
+            ->assertSee('data-template-variant="executive-ledger"', false)
+            ->assertSee('data-template-variant="navy-profile"', false)
+            ->assertSee('data-template-variant="slate-manager"', false)
+            ->assertSee('data-template-variant="marketing-sidebar"', false)
+            ->assertSee('data-template-variant="copper-header"', false)
+            ->assertSee('data-template-variant="rose-designer"', false)
+            ->assertSee('data-template-variant="graduate-focus"', false)
+            ->assertSee('data-template-variant="academic-plain"', false);
 
         $this->assertGreaterThanOrEqual(24, ResumeTemplate::where('is_active', true)->count());
+    }
+
+    public function test_repeated_template_families_render_distinct_thumbnail_variants(): void
+    {
+        $this->seed();
+        $renderedVariants = [];
+
+        ResumeTemplate::where('is_active', true)->get()->each(function (ResumeTemplate $template) use (&$renderedVariants): void {
+            $html = Blade::render('<x-resume-template-thumbnail :template="$template" />', [
+                'template' => $template,
+            ]);
+
+            $this->assertStringContainsString('data-template-variant="'.$template->slug.'"', $html);
+            $renderedVariants[] = $template->slug;
+        });
+
+        $this->assertSame($renderedVariants, array_values(array_unique($renderedVariants)));
     }
 
     public function test_template_gallery_can_be_grouped_by_category(): void
@@ -234,6 +259,71 @@ class ResumeTemplateTest extends TestCase
         $this->assertStringStartsWith('%PDF-', $pdf);
         $this->assertStringContainsString('/Count 1', $pdf);
         $this->assertStringContainsString('/MediaBox [0.000 0.000 595.280 841.890]', $pdf);
+    }
+
+    public function test_resume_can_be_exported_as_a_word_document(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'Demo User',
+            'email_verified_at' => now(),
+            'onboarding_completed_at' => now(),
+        ]);
+        $resume = Resume::create([
+            'user_id' => $user->id,
+            'title' => 'Finance Manager Resume',
+            'type' => 'general',
+            'professional_title' => 'Finance Manager',
+            'professional_summary' => 'Finance manager with reporting experience.',
+            'last_edited_at' => now(),
+        ]);
+
+        $response = $this->actingAs($user)->get(route('resumes.export-word', $resume));
+
+        $response
+            ->assertOk()
+            ->assertHeader('content-type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+            ->assertHeader('content-disposition', 'attachment; filename="finance-manager-resume.docx"');
+
+        $document = $response->getContent();
+        $temporaryDocumentPath = tempnam(sys_get_temp_dir(), 'resume-word-test-');
+
+        file_put_contents($temporaryDocumentPath, $document);
+        $archive = new \ZipArchive;
+
+        try {
+            $this->assertTrue($archive->open($temporaryDocumentPath) === true);
+            $this->assertNotFalse($archive->locateName('word/document.xml'));
+            $this->assertStringContainsString('Finance Manager', (string) $archive->getFromName('word/document.xml'));
+        } finally {
+            $archive->close();
+            @unlink($temporaryDocumentPath);
+        }
+    }
+
+    public function test_resume_can_be_exported_as_a_png_image(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'Demo User',
+            'email_verified_at' => now(),
+            'onboarding_completed_at' => now(),
+        ]);
+        $resume = Resume::create([
+            'user_id' => $user->id,
+            'title' => 'Finance Manager Resume',
+            'type' => 'general',
+            'professional_title' => 'Finance Manager',
+            'professional_summary' => 'Finance manager with reporting experience.',
+            'last_edited_at' => now(),
+        ]);
+
+        $response = $this->actingAs($user)->get(route('resumes.export-image', $resume));
+
+        $response
+            ->assertOk()
+            ->assertHeader('content-type', 'image/png')
+            ->assertHeader('content-disposition', 'attachment; filename="finance-manager-resume.png"');
+
+        $this->assertStringStartsWith("\x89PNG\r\n\x1a\n", $response->getContent());
     }
 
     public function test_resume_builder_updates_template_for_existing_resume(): void
