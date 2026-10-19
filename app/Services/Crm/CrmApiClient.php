@@ -46,6 +46,14 @@ class CrmApiClient
         return $this->request($concept)->get("api/s/v3/customers/{$customerId}/invoices.json");
     }
 
+    public function renderedPolicy(Concept $concept, string $policyType): Response
+    {
+        return $this->request($concept)->get('api/s/v3/website/tos/rendered.json', [
+            'tos_type' => $policyType,
+            '_locale' => app()->getLocale(),
+        ]);
+    }
+
     public function updateCustomer(Concept $concept, string $customerId, array $customer): Response
     {
         return $this->request($concept)->patch("api/s/v3/customers/{$customerId}.json", $customer);

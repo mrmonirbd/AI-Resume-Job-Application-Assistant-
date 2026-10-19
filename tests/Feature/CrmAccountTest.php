@@ -144,7 +144,9 @@ class CrmAccountTest extends TestCase
         $this->actingAs($user)
             ->get(route('subscription.show'))
             ->assertOk()
-            ->assertSee('Pro');
+            ->assertSee('Pro')
+            ->assertSee('Terms &amp; Conditions', false)
+            ->assertSee('Cancel Subscription');
 
         $this->actingAs($user)
             ->get(route('subscription.payment-history'))
@@ -168,14 +170,32 @@ class CrmAccountTest extends TestCase
         ]);
     }
 
-    public function test_legal_pages_are_public_and_use_the_concept_support_contact(): void
+    public function test_legal_pages_are_public_and_load_policy_content_from_the_crm(): void
     {
         $this->crmConcept(['support_email' => 'support@example.test']);
+
+        Http::fake([
+            'https://crm.example.test/api/s/v3/website/tos/rendered.json?tos_type=privacy_policy&_locale=en' => Http::response([
+                'status' => 'success',
+                'data' => [
+                    'html' => '<h2>CRM privacy policy</h2><p>Your CRM policy content.</p>',
+                ],
+            ]),
+        ]);
 
         $this->get(route('legal.show', 'privacy'))
             ->assertOk()
             ->assertSee('Privacy policy')
-            ->assertSee('support@example.test');
+            ->assertSee('CRM privacy policy')
+            ->assertSee('Your CRM policy content.')
+            ->assertSee('support@example.test')
+            ->assertSee('Terms &amp; Conditions', false)
+            ->assertSee('Cancel Subscription');
+
+        Http::assertSent(function ($request): bool {
+            return $request->method() === 'GET'
+                && $request->url() === 'https://crm.example.test/api/s/v3/website/tos/rendered.json?tos_type=privacy_policy&_locale=en';
+        });
     }
 
     /**

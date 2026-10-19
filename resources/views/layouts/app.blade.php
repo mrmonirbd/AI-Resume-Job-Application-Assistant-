@@ -37,6 +37,20 @@
                     @endforeach
                 </nav>
 
+                <div class="mt-6 border-t border-black/10 pt-5">
+                    <p class="px-3 text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">Account and legal</p>
+                    <nav class="mt-2 space-y-1 text-sm font-medium">
+                        @foreach ([
+                            ['Terms & Conditions', 'terms'],
+                            ['Privacy Policy', 'privacy'],
+                            ['Refund Policy', 'refund-policy'],
+                        ] as [$label, $page])
+                            <a href="{{ route('legal.show', $page) }}" class="block rounded-lg px-3 py-2.5 {{ request()->routeIs('legal.show') && request()->route('page') === $page ? 'bg-neutral-950 text-white' : 'text-neutral-600 hover:bg-black/5 hover:text-neutral-950' }}">{{ $label }}</a>
+                        @endforeach
+                        <a href="{{ route('subscription.show') }}#cancel-subscription" class="mt-2 block rounded-lg px-3 py-2.5 {{ request()->routeIs('subscription.show') ? 'bg-neutral-950 text-white' : 'text-neutral-600 hover:bg-black/5 hover:text-neutral-950' }}">Cancel Subscription</a>
+                    </nav>
+                </div>
+
                 <div class="mt-auto pt-8">
                     <div class="rounded-lg border border-black/10 bg-[#f6f7f9] p-4">
                         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">Account</p>

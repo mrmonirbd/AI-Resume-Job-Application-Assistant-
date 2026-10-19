@@ -25,7 +25,7 @@
                         @endforeach
                     </div>
                     @if (filled($user->crm_subscription_id) && strtolower((string) $status) === 'active')
-                        <form method="POST" action="{{ route('subscription.cancel') }}" class="mt-8 border-t border-black/10 pt-6" onsubmit="return confirm('Cancel this subscription through the CRM?')">
+                        <form id="cancel-subscription" method="POST" action="{{ route('subscription.cancel') }}" class="mt-8 border-t border-black/10 pt-6" onsubmit="return confirm('Cancel this subscription through the CRM?')">
                             @csrf
                             <input type="hidden" name="confirmation" value="cancel">
                             <p class="text-sm leading-6 text-neutral-600">Cancelling is sent directly to the CRM and stops future renewal under the CRM billing terms.</p>

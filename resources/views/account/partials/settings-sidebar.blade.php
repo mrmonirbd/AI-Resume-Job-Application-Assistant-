@@ -5,4 +5,10 @@
             <a href="{{ route($route) }}" class="block rounded-md px-3 py-2.5 {{ request()->routeIs($route) ? 'bg-neutral-950 text-white' : 'text-neutral-600 hover:bg-black/5 hover:text-neutral-950' }}">{{ $label }}</a>
         @endforeach
     </nav>
+    <nav class="mt-5 border-t border-black/10 pt-4 text-sm font-semibold">
+        <a href="{{ route('legal.show', 'terms') }}" class="block rounded-md px-3 py-2.5 text-neutral-600 hover:bg-black/5 hover:text-neutral-950">Terms &amp; Conditions</a>
+        <a href="{{ route('legal.show', 'privacy') }}" class="block rounded-md px-3 py-2.5 text-neutral-600 hover:bg-black/5 hover:text-neutral-950">Privacy Policy</a>
+        <a href="{{ route('legal.show', 'refund-policy') }}" class="block rounded-md px-3 py-2.5 text-neutral-600 hover:bg-black/5 hover:text-neutral-950">Refund Policy</a>
+        <a href="{{ route('subscription.show') }}#cancel-subscription" class="mt-2 block rounded-md border-l-2 border-red-500 bg-red-50 px-3 py-2.5 text-red-700 hover:bg-red-100">Cancel Subscription</a>
+    </nav>
 </aside>
