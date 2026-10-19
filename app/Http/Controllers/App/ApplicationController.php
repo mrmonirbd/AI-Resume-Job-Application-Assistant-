@@ -13,6 +13,7 @@ class ApplicationController extends Controller
     public function index(Request $request): View
     {
         $applications = $request->user()->applications()
+            ->has('job')
             ->with(['job.analysis', 'job.matches'])
             ->latest()
             ->get()

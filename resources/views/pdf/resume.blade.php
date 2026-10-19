@@ -11,8 +11,11 @@
     $usesDarkSidebar = in_array($style, ['sidebar', 'right-rail', 'technical'], true);
     $sidebarBackground = $usesDarkSidebar ? $dark : $soft;
     $sidebarText = $usesDarkSidebar ? '#ffffff' : '#111827';
-    $profileImagePath = public_path('images/demo-profile.png');
-    $profileImageSource = file_exists($profileImagePath) ? 'data:image/png;base64,'.base64_encode((string) file_get_contents($profileImagePath)) : null;
+    $profileImagePath = $resume->user->profile_photo_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($resume->user->profile_photo_path)
+        ? \Illuminate\Support\Facades\Storage::disk('public')->path($resume->user->profile_photo_path)
+        : public_path('images/demo-profile.png');
+    $profileImageMime = file_exists($profileImagePath) ? mime_content_type($profileImagePath) : null;
+    $profileImageSource = $profileImageMime ? 'data:'.$profileImageMime.';base64,'.base64_encode((string) file_get_contents($profileImagePath)) : null;
 @endphp
 <!DOCTYPE html>
 <html>

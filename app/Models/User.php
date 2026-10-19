@@ -33,6 +33,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'crm_web_user_id',
         'domain_name',
         'crm_profile',
+        'profile_photo_path',
     ];
 
     /**

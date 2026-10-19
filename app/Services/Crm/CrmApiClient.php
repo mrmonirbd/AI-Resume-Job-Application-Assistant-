@@ -13,7 +13,8 @@ class CrmApiClient
     public function isConfigured(?Concept $concept): bool
     {
         return $concept?->is_enabled === true
-            && filled($concept->crm_api_url)
+            && $concept->crm?->is_enabled === true
+            && filled($concept->crm?->api_url)
             && filled($concept->crm_api_key);
     }
 
@@ -88,7 +89,7 @@ class CrmApiClient
 
     private function request(Concept $concept): PendingRequest
     {
-        return Http::baseUrl(rtrim((string) $concept->crm_api_url, '/'))
+        return Http::baseUrl(rtrim((string) $concept->crm?->api_url, '/'))
             ->acceptJson()
             ->asJson()
             ->withHeader('x-api-key', (string) $concept->crm_api_key)

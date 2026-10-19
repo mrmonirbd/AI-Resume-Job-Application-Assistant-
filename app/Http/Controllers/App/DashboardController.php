@@ -12,7 +12,11 @@ class DashboardController extends Controller
     public function __invoke(Request $request): View
     {
         $user = $request->user();
-        $applications = $user->applications()->with(['job', 'job.matches'])->latest()->get();
+        $applications = $user->applications()
+            ->has('job')
+            ->with(['job', 'job.matches'])
+            ->latest()
+            ->get();
         $resumes = $user->resumes()->latest('last_edited_at')->take(5)->get();
 
         return view('app.dashboard', [

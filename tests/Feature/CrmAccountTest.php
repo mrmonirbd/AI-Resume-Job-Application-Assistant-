@@ -3,10 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\Concept;
+use App\Models\Crm;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class CrmAccountTest extends TestCase
@@ -107,6 +110,36 @@ class CrmAccountTest extends TestCase
         });
     }
 
+    public function test_profile_photo_can_be_uploaded_and_used_by_the_profile_screen(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+            'onboarding_completed_at' => now(),
+        ]);
+
+        $this->actingAs($user)->patch(route('profile.update'), [
+            'first_name' => 'Nusrat',
+            'last_name' => 'Jahan',
+            'phone' => '+8801700000000',
+            'address' => 'Road 1',
+            'city' => 'Dhaka',
+            'postcode' => '1205',
+            'profile_photo' => UploadedFile::fake()->image('profile.png', 400, 400),
+        ])->assertSessionHas('status', 'Profile updated.');
+
+        $profilePhotoPath = $user->refresh()->profile_photo_path;
+
+        $this->assertNotNull($profilePhotoPath);
+        Storage::disk('public')->assertExists($profilePhotoPath);
+        $this->actingAs($user)->get(route('profile.edit'))
+            ->assertOk()
+            ->assertSee('/storage/'.$profilePhotoPath, false)
+            ->assertSee('Crop profile picture')
+            ->assertSee('Use cropped photo')
+            ->assertSee('profilePhotoCropper', false);
+    }
+
     public function test_subscription_screen_loads_crm_invoices_and_can_cancel_the_linked_subscription(): void
     {
         $concept = $this->crmConcept();
@@ -176,9 +209,8 @@ class CrmAccountTest extends TestCase
 
         Http::fake([
             'https://crm.example.test/api/s/v3/website/tos/rendered.json?tos_type=privacy_policy&_locale=en' => Http::response([
-                'status' => 'success',
                 'data' => [
-                    'html' => '<h2>CRM privacy policy</h2><p>Your CRM policy content.</p>',
+                    'html' => '<style>p { color: red; }</style><h2 style="font-family: serif">CRM privacy policy</h2><p>Your CRM policy content.</p><script>window.policy = true;</script>',
                 ],
             ]),
         ]);
@@ -189,6 +221,9 @@ class CrmAccountTest extends TestCase
             ->assertSee('CRM privacy policy')
             ->assertSee('Your CRM policy content.')
             ->assertSee('support@example.test')
+            ->assertDontSee('<style>', false)
+            ->assertDontSee('font-family', false)
+            ->assertDontSee('window.policy')
             ->assertSee('Terms &amp; Conditions', false)
             ->assertSee('Cancel Subscription');
 
@@ -203,10 +238,16 @@ class CrmAccountTest extends TestCase
      */
     private function crmConcept(array $attributes = []): Concept
     {
+        $crm = Crm::create([
+            'name' => 'Test CRM',
+            'api_url' => 'https://crm.example.test',
+            'is_enabled' => true,
+        ]);
+
         return Concept::create(array_merge([
             'name' => 'Resume CRM',
             'domain_name' => 'localhost',
-            'crm_api_url' => 'https://crm.example.test',
+            'crm_id' => $crm->id,
             'crm_api_key' => 'crm-key',
             'is_default' => true,
             'is_enabled' => true,

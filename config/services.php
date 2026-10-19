@@ -45,6 +45,7 @@ return [
     ],
 
     'crm' => [
+        'name' => env('CRM_NAME', 'Primary CRM'),
         'timeout' => env('CRM_TIMEOUT', 10),
         'retries' => env('CRM_RETRIES', 1),
         'retry_sleep_ms' => env('CRM_RETRY_SLEEP_MS', 200),

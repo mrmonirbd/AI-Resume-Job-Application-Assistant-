@@ -71,13 +71,13 @@
         </aside>
     @endif
 
-    <main class="min-h-screen px-5 py-10 sm:py-16 {{ auth()->guest() ? 'lg:ml-72' : '' }}">
-        <article class="mx-auto max-w-3xl rounded-lg border border-black/10 bg-white p-6 shadow-sm sm:p-10">
+    <main class="min-h-screen px-5 py-8 sm:px-8 sm:py-12 {{ auth()->guest() ? 'lg:ml-72' : '' }}">
+        <article class="mx-auto max-w-6xl rounded-lg border border-black/10 bg-white p-6 shadow-sm sm:p-10 lg:p-12">
             <p class="text-sm font-bold uppercase tracking-[0.18em] text-teal-700">Legal</p>
             <h1 class="mt-3 text-3xl font-black">{{ $policy['title'] }}</h1>
 
             @if ($policy['html'])
-                <div class="mt-8 text-sm leading-7 text-neutral-600 [&_a]:font-semibold [&_a]:text-teal-700 [&_h1]:mt-8 [&_h1]:text-2xl [&_h1]:font-black [&_h2]:mt-8 [&_h2]:text-lg [&_h2]:font-black [&_h3]:mt-6 [&_h3]:font-bold [&_li]:ml-5 [&_li]:list-disc [&_ol]:mt-3 [&_p]:mt-4 [&_ul]:mt-3">
+                <div class="mt-8 max-w-none text-base leading-7 text-neutral-700 [&_a]:font-semibold [&_a]:text-teal-700 [&_a]:underline [&_h1]:mt-10 [&_h1]:text-2xl [&_h1]:font-black [&_h2]:mt-10 [&_h2]:text-xl [&_h2]:font-black [&_h3]:mt-8 [&_h3]:text-lg [&_h3]:font-bold [&_li]:mt-2 [&_li]:ml-6 [&_ol]:mt-4 [&_ol]:list-decimal [&_p]:mt-4 [&_table]:mt-6 [&_table]:w-full [&_table]:border-collapse [&_td]:border [&_td]:border-black/10 [&_td]:p-3 [&_th]:border [&_th]:border-black/10 [&_th]:bg-neutral-50 [&_th]:p-3 [&_th]:text-left [&_ul]:mt-4 [&_ul]:list-disc">
                     {!! $policy['html'] !!}
                 </div>
             @else

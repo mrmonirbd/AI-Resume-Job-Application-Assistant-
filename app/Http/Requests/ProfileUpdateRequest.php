@@ -23,6 +23,7 @@ class ProfileUpdateRequest extends FormRequest
             'professional_title' => ['nullable', 'string', 'max:160'],
             'location' => ['nullable', 'string', 'max:160'],
             'career_goal' => ['nullable', 'string', 'max:255'],
+            'profile_photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
         ];
     }
 }

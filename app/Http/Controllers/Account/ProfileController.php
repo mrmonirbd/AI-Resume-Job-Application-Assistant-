@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
@@ -70,6 +71,15 @@ class ProfileController extends Controller
         $user->crm_profile = array_merge($user->crm_profile ?? [], Arr::only($validated, [
             'first_name', 'last_name', 'phone', 'address', 'city', 'postcode',
         ]));
+
+        if ($request->hasFile('profile_photo')) {
+            $previousPhotoPath = $user->profile_photo_path;
+            $user->profile_photo_path = $request->file('profile_photo')->store("profile-photos/{$user->id}", 'public');
+
+            if (filled($previousPhotoPath)) {
+                Storage::disk('public')->delete($previousPhotoPath);
+            }
+        }
 
         $user->save();
 

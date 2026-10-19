@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Concept extends Model
 {
     protected $fillable = [
         'name',
+        'crm_id',
         'domain_name',
-        'crm_api_url',
         'crm_api_key',
         'crm_service_id',
         'product_id',
@@ -28,9 +29,13 @@ class Concept extends Model
     protected function casts(): array
     {
         return [
-            'crm_api_key' => 'encrypted',
             'is_default' => 'boolean',
             'is_enabled' => 'boolean',
         ];
+    }
+
+    public function crm(): BelongsTo
+    {
+        return $this->belongsTo(Crm::class);
     }
 }

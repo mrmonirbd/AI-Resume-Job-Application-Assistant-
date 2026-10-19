@@ -39,7 +39,7 @@
         <div class="grid min-h-[720px] {{ $sidebarGridClass }}">
             <aside class="p-5" style="background: {{ $sidebarBackground }}; color: {{ $sidebarText }};">
                 @if ($hasPhoto)
-                    <x-demo-profile-image class="mb-5 h-20 w-20 border-4 border-white/80" />
+                    <x-demo-profile-image :user="$resume->user" class="mb-5 h-20 w-20 border-4 border-white/80" />
                 @endif
                 <h3 class="text-xl font-black uppercase leading-tight tracking-wide">{{ $resume->user->name }}</h3>
                 @if ($title)
@@ -133,7 +133,7 @@
             @endif
             <div class="relative flex items-center gap-5">
                 @if ($hasPhoto)
-                    <x-demo-profile-image class="h-20 w-20 shrink-0 border-4 border-white" />
+                    <x-demo-profile-image :user="$resume->user" class="h-20 w-20 shrink-0 border-4 border-white" />
                 @endif
                 <div>
                     <h3 class="text-3xl font-black uppercase leading-none tracking-wide" style="color: {{ $style === 'dark-header' ? '#ffffff' : '#111827' }};">{{ $resume->user->name }}</h3>
@@ -195,7 +195,7 @@
     @elseif ($style === 'timeline')
         <div class="p-7">
             <header class="flex items-center gap-5 border-b pb-5" style="border-color: {{ $accent }};">
-                <x-demo-profile-image class="h-20 w-20 shrink-0 border-4 border-white shadow-sm" />
+                <x-demo-profile-image :user="$resume->user" class="h-20 w-20 shrink-0 border-4 border-white shadow-sm" />
                 <div>
                     <h3 class="text-3xl font-black uppercase leading-none">{{ $resume->user->name }}</h3>
                     <p class="mt-2 font-semibold" style="color: {{ $accent }};">{{ $title }}</p>
