@@ -8,6 +8,7 @@ use App\Models\ResumeTemplate;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Process;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -571,6 +572,82 @@ class ResumeTemplateTest extends TestCase
             ->call('saveOverview')->assertHasNoErrors();
 
         $this->assertDatabaseHas('resumes', ['id' => $resume->id, 'template_id' => $template->id, 'accent_color' => '#abcdef']);
+    }
+
+    public function test_editor_exports_the_current_draft_without_saving_it(): void
+    {
+        $this->seed();
+        $user = User::where('email', 'demo@example.com')->firstOrFail();
+        $resume = $user->masterResume()->firstOrFail();
+        $originalTemplateId = $resume->template_id;
+        $originalTitle = $resume->title;
+        $template = ResumeTemplate::where('slug', 'modern-signal')->firstOrFail();
+        $component = Livewire::actingAs($user)->test(ResumeBuilder::class, ['resume' => $resume])
+            ->set('overview.template_id', $template->id)
+            ->set('overview.title', 'Current Draft Export')
+            ->set('overview.professional_summary', 'Current draft summary exported before saving.')
+            ->dispatch('export-resume', format: 'pdf')
+            ->assertHasNoErrors()
+            ->assertFileDownloaded('current-draft-export.pdf', contentType: 'application/pdf');
+
+        $pdf = base64_decode($component->effects['download']['content']);
+        $this->assertStringStartsWith('%PDF-', $pdf);
+        $temporaryPdf = tempnam(sys_get_temp_dir(), 'resume-test-');
+        try {
+            file_put_contents($temporaryPdf, $pdf);
+            $text = Process::run(['pdftotext', $temporaryPdf, '-'])->throw()->output();
+            $this->assertStringContainsString('Current draft summary exported before saving.', $text);
+        } finally {
+            unlink($temporaryPdf);
+        }
+        $this->assertDatabaseHas('resumes', ['id' => $resume->id, 'title' => $originalTitle, 'template_id' => $originalTemplateId]);
+    }
+
+    public function test_image_export_renders_the_selected_split_template_and_custom_color(): void
+    {
+        $this->seed();
+        $user = User::where('email', 'demo@example.com')->firstOrFail();
+        $resume = $user->masterResume()->firstOrFail();
+        $template = ResumeTemplate::where('slug', 'modern-signal')->firstOrFail();
+        $component = Livewire::actingAs($user)->test(ResumeBuilder::class, ['resume' => $resume])
+            ->set('overview.template_id', $template->id)
+            ->set('overview.accent_color', '#c45d20')
+            ->call('exportCurrent', 'png')
+            ->assertHasNoErrors()
+            ->assertFileDownloaded(contentType: 'image/png');
+
+        $png = base64_decode($component->effects['download']['content']);
+        $image = imagecreatefromstring($png);
+        $pixel = imagecolorat($image, (int) (imagesx($image) * 0.85), (int) (imagesy($image) * 0.1));
+        $this->assertSame(0xC45D20, $pixel & 0xFFFFFF, 'The split header accent must be visible in the exported image.');
+        imagedestroy($image);
+    }
+
+    public function test_invalid_draft_settings_cannot_be_exported(): void
+    {
+        $user = User::factory()->create();
+        $resume = $user->resumes()->create(['title' => 'My resume']);
+
+        Livewire::actingAs($user)->test(ResumeBuilder::class, ['resume' => $resume])
+            ->set('overview.accent_color', 'red; display:none')
+            ->call('exportCurrent')
+            ->assertHasErrors(['overview.accent_color' => 'hex_color'])
+            ->assertNoFileDownloaded();
+    }
+
+    public function test_all_seeded_template_layouts_can_be_exported_as_pdf(): void
+    {
+        $this->seed();
+        $user = User::where('email', 'demo@example.com')->firstOrFail();
+        $resume = $user->masterResume()->firstOrFail();
+        $this->actingAs($user);
+
+        foreach (ResumeTemplate::where('is_active', true)->get() as $template) {
+            $resume->update(['template_id' => $template->id, 'accent_color' => $template->accent_color, 'font_family' => $template->font_family]);
+            $response = $this->get(route('resumes.export', $resume));
+            $response->assertOk()->assertHeader('content-type', 'application/pdf');
+            $this->assertStringStartsWith('%PDF-', $response->getContent(), $template->name.' must export successfully.');
+        }
     }
 
     private function documentPreviewHtml(string $html): string

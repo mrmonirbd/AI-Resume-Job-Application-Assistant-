@@ -83,8 +83,8 @@
                 <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div>
                         <p class="text-sm font-black text-teal-900">AI suggestion ready</p>
-                        <p class="mt-2 text-sm leading-6 text-teal-800">{{ $aiSuggestion['ai_rewrite'] ?? '' }}</p>
-                        <p class="mt-3 text-xs font-semibold text-brand-700">{{ $aiSuggestion['ai_recommendation'] ?? 'Review before accepting.' }}</p>
+                        <p class="mt-2 text-sm leading-6 text-teal-800">{{ $safeAiSuggestion['ai_rewrite'] ?? '' }}</p>
+                        <p class="mt-3 text-xs font-semibold text-brand-700">{{ $safeAiSuggestion['ai_recommendation'] ?? 'Review before accepting.' }}</p>
                     </div>
                     <div class="flex shrink-0 gap-2">
                         <button type="button" wire:click="acceptSuggestion" class="rounded-lg bg-brand-700 px-4 py-2 text-sm font-black text-white">Accept</button>

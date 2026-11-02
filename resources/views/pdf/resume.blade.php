@@ -19,7 +19,7 @@
     foreach (['experience' => 'experiences', 'education' => 'educations', 'skills' => 'skills', 'projects' => 'projects', 'certifications' => 'certifications', 'languages' => 'languages'] as $type => $relation) {
         $collections[$relation] = data_get($sectionSettings->get($type), 'is_visible', true) ? $resume->$relation : collect();
     }
-    $title = $resume->professional_title ?: $resume->user->professional_title;
+    $title = $resume->professional_title ?? $resume->user->professional_title;
     $contact = collect([$resume->user->email, $resume->user->location])->filter()->join(' | ');
     $hasSidebar = in_array($style, ['sidebar', 'soft-sidebar', 'right-rail', 'technical'], true);
     $usesDarkSidebar = in_array($style, ['sidebar', 'right-rail', 'technical'], true);

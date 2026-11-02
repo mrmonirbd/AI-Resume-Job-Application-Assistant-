@@ -7,18 +7,18 @@ use App\Models\Education;
 use App\Models\Experience;
 use App\Models\Project;
 use App\Models\Resume;
-use App\Models\ResumeTemplate;
 use App\Models\ResumeSection;
-use App\Services\PdfExportService;
-use App\Services\ImageExportService;
-use App\Services\WordExportService;
+use App\Models\ResumeTemplate;
 use App\Models\Skill;
+use App\Services\ImageExportService;
+use App\Services\PdfExportService;
+use App\Services\WordExportService;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
-use Livewire\Component;
 use Livewire\Attributes\On;
+use Livewire\Component;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ResumeBuilder extends Component
@@ -295,7 +295,12 @@ class ResumeBuilder extends Component
             return;
         }
 
-        $this->overview['professional_summary'] = $this->aiSuggestion['ai_rewrite'] ?? $this->overview['professional_summary'];
+        $this->authorizeOwner();
+        $suggestion = app(RewriteResumeText::class)->normalize(
+            $this->aiSuggestion,
+            is_string($this->overview['professional_summary'] ?? null) ? $this->overview['professional_summary'] : ''
+        );
+        $this->overview['professional_summary'] = $suggestion['ai_rewrite'];
         $this->aiSuggestion = null;
         $this->notice = 'Suggestion added to preview. Save to keep your changes.';
     }
@@ -400,6 +405,10 @@ class ResumeBuilder extends Component
 
         return [
             'templates' => $templates,
+            'safeAiSuggestion' => $this->aiSuggestion ? app(RewriteResumeText::class)->normalize(
+                $this->aiSuggestion,
+                is_string($this->overview['professional_summary'] ?? null) ? $this->overview['professional_summary'] : ''
+            ) : null,
             'previewTemplate' => $templates->firstWhere('id', $this->overview['template_id'] ?? null) ?? $this->resume->template,
             'experiences' => $experiences,
             'educations' => $educations,

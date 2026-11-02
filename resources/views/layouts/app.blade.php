@@ -30,7 +30,7 @@
                         ['AI Tools', 'ai-tools.index', 'sparkles'],
                         ['Cover Letters', 'cover-letters.index', 'mail'],
                         ['Templates', 'templates.index', 'grid'],
-                        ['Subscription', 'subscription.show', 'layers'],
+                        // ['Subscription', 'subscription.show', 'layers'],
                     ] as [$label, $route, $icon])
                         <a href="{{ route($route) }}" aria-current="{{ request()->routeIs($route) ? 'page' : 'false' }}" class="flex items-center justify-between rounded-xl px-3 py-2.5 transition-colors {{ request()->routeIs($route) ? 'bg-brand-50 text-brand-700 ring-1 ring-brand-100' : 'text-muted hover:bg-slate-50 hover:text-ink' }}">
                             <span class="flex items-center gap-3"><x-workspace-icon :name="$icon" class="size-5" />{{ $label }}</span>
