@@ -39,45 +39,45 @@
     @endphp
 
     @if (auth()->guest())
-        <header class="sticky top-0 z-20 border-b border-black/10 bg-white/95 px-5 py-4 backdrop-blur lg:hidden">
+        <header class="sticky top-0 z-20 border-b border-line bg-white/95 px-5 py-4 backdrop-blur lg:hidden">
             <div class="flex items-center justify-between gap-4">
                 <a href="{{ route('landing') }}" class="flex items-center gap-3 font-bold">
-                    <span class="grid h-9 w-9 place-items-center rounded-md bg-neutral-950 text-xs font-black text-white">AI</span>
+                    <span class="grid h-9 w-9 place-items-center rounded-md bg-brand-700 text-xs font-black text-white">AI</span>
                     <span>{{ $brand }}</span>
                 </a>
-                <a href="{{ route('login') }}" class="text-sm font-semibold text-neutral-600 hover:text-neutral-950">Log in</a>
+                <a href="{{ route('login') }}" class="text-sm font-semibold text-neutral-600 hover:text-ink">Log in</a>
             </div>
         </header>
 
-        <aside class="fixed inset-y-0 left-0 z-30 hidden w-72 flex-col overflow-y-auto border-r border-black/10 bg-white p-5 lg:flex">
+        <aside class="fixed inset-y-0 left-0 z-30 hidden w-72 flex-col overflow-y-auto border-r border-line bg-white p-5 lg:flex">
             <a href="{{ route('landing') }}" class="flex items-center gap-3">
-                <span class="grid h-10 w-10 place-items-center rounded-lg bg-neutral-950 text-sm font-black text-white">AI</span>
+                <span class="grid h-10 w-10 place-items-center rounded-lg bg-brand-700 text-sm font-black text-white">AI</span>
                 <span>
                     <span class="block text-sm font-bold">{{ $brand }}</span>
-                    <span class="block text-xs text-neutral-500">Career workspace</span>
+                    <span class="block text-xs text-muted">Career workspace</span>
                 </span>
             </a>
 
             <nav class="mt-10 space-y-1 text-sm font-medium">
                 @foreach ($legalLinks as [$label, $slug])
-                    <a href="{{ route('legal.show', $slug) }}" class="block rounded-lg px-3 py-2.5 {{ $currentPage === $slug ? 'bg-neutral-950 text-white' : 'text-neutral-600 hover:bg-black/5 hover:text-neutral-950' }}">{{ $label }}</a>
+                    <a href="{{ route('legal.show', $slug) }}" class="block rounded-lg px-3 py-2.5 {{ $currentPage === $slug ? 'bg-brand-700 text-white' : 'text-neutral-600 hover:bg-black/5 hover:text-ink' }}">{{ $label }}</a>
                 @endforeach
-                <a href="{{ $cancelUrl }}" class="mt-3 block rounded-lg px-3 py-2.5 {{ request()->routeIs('subscription.show') ? 'bg-neutral-950 text-white' : 'text-neutral-600 hover:bg-black/5 hover:text-neutral-950' }}">Cancel Subscription</a>
+                <a href="{{ $cancelUrl }}" class="mt-3 block rounded-lg px-3 py-2.5 {{ request()->routeIs('subscription.show') ? 'bg-brand-700 text-white' : 'text-neutral-600 hover:bg-black/5 hover:text-ink' }}">Cancel Subscription</a>
             </nav>
 
             <div class="mt-auto pt-8">
-                <a href="{{ route('login') }}" class="block rounded-md bg-neutral-950 px-4 py-2.5 text-center text-sm font-semibold text-white">Log in</a>
+                <a href="{{ route('login') }}" class="block rounded-md bg-brand-700 px-4 py-2.5 text-center text-sm font-semibold text-white">Log in</a>
             </div>
         </aside>
     @endif
 
     <main class="min-h-screen px-5 py-8 sm:px-8 sm:py-12 {{ auth()->guest() ? 'lg:ml-72' : '' }}">
-        <article class="mx-auto max-w-6xl rounded-lg border border-black/10 bg-white p-6 shadow-sm sm:p-10 lg:p-12">
-            <p class="text-sm font-bold uppercase tracking-[0.18em] text-teal-700">Legal</p>
+        <article class="mx-auto max-w-6xl rounded-lg border border-line bg-white p-6 shadow-sm sm:p-10 lg:p-12">
+            <p class="text-sm font-bold uppercase tracking-[0.18em] text-brand-700">Legal</p>
             <h1 class="mt-3 text-3xl font-black">{{ $policy['title'] }}</h1>
 
             @if ($policy['html'])
-                <div class="mt-8 max-w-none text-base leading-7 text-neutral-700 [&_a]:font-semibold [&_a]:text-teal-700 [&_a]:underline [&_h1]:mt-10 [&_h1]:text-2xl [&_h1]:font-black [&_h2]:mt-10 [&_h2]:text-xl [&_h2]:font-black [&_h3]:mt-8 [&_h3]:text-lg [&_h3]:font-bold [&_li]:mt-2 [&_li]:ml-6 [&_ol]:mt-4 [&_ol]:list-decimal [&_p]:mt-4 [&_table]:mt-6 [&_table]:w-full [&_table]:border-collapse [&_td]:border [&_td]:border-black/10 [&_td]:p-3 [&_th]:border [&_th]:border-black/10 [&_th]:bg-neutral-50 [&_th]:p-3 [&_th]:text-left [&_ul]:mt-4 [&_ul]:list-disc">
+                <div class="mt-8 max-w-none text-base leading-7 text-neutral-700 [&_a]:font-semibold [&_a]:text-brand-700 [&_a]:underline [&_h1]:mt-10 [&_h1]:text-2xl [&_h1]:font-black [&_h2]:mt-10 [&_h2]:text-xl [&_h2]:font-black [&_h3]:mt-8 [&_h3]:text-lg [&_h3]:font-bold [&_li]:mt-2 [&_li]:ml-6 [&_ol]:mt-4 [&_ol]:list-decimal [&_p]:mt-4 [&_table]:mt-6 [&_table]:w-full [&_table]:border-collapse [&_td]:border [&_td]:border-line [&_td]:p-3 [&_th]:border [&_th]:border-line [&_th]:bg-neutral-50 [&_th]:p-3 [&_th]:text-left [&_ul]:mt-4 [&_ul]:list-disc">
                     {!! $policy['html'] !!}
                 </div>
             @else
@@ -92,9 +92,9 @@
                 </div>
             @endif
 
-            <div class="mt-10 border-t border-black/10 pt-6 text-sm text-neutral-600">
+            <div class="mt-10 border-t border-line pt-6 text-sm text-neutral-600">
                 @if ($supportEmail)
-                    Questions about this policy? <a class="font-semibold text-teal-700" href="mailto:{{ $supportEmail }}">{{ $supportEmail }}</a>
+                    Questions about this policy? <a class="font-semibold text-brand-700" href="mailto:{{ $supportEmail }}">{{ $supportEmail }}</a>
                 @else
                     Questions about this policy? Contact the support team for your subscription.
                 @endif

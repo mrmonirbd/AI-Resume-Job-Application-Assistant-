@@ -30,9 +30,9 @@ Route::middleware('guest')->group(function () {
     Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('login', [AuthenticatedSessionController::class, 'store'])->middleware('throttle:login');
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
+    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])->middleware('throttle:6,1')->name('password.email');
     Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
-    Route::post('reset-password', [NewPasswordController::class, 'store'])->name('password.store');
+    Route::post('reset-password', [NewPasswordController::class, 'store'])->middleware('throttle:6,1')->name('password.store');
 });
 
 Route::middleware('auth')->group(function () {
@@ -72,7 +72,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('jobs/{job}/match', [JobController::class, 'match'])->middleware('throttle:ai')->name('jobs.match');
     Route::post('jobs/{job}/tailor', [JobController::class, 'tailor'])->middleware('throttle:ai')->name('jobs.tailor');
     Route::post('jobs/{job}/cover-letter', [JobController::class, 'coverLetter'])->middleware('throttle:ai')->name('jobs.cover-letter');
-    Route::resource('jobs', JobController::class)->except(['edit']);
+    Route::resource('jobs', JobController::class)->except(['edit', 'update'])->middlewareFor('store', 'throttle:ai');
 
     Route::get('applications', [ApplicationController::class, 'index'])->name('applications.index');
     Route::patch('applications/{application}/stage', [ApplicationController::class, 'stage'])->name('applications.stage');

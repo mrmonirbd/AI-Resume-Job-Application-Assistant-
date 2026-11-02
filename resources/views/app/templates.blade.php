@@ -10,36 +10,66 @@
 
     <div
         class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"
-        x-data="{ activeTemplate: null, configuringTemplate: @js(old('template_slug')) }"
+        x-data="{
+            activeTemplate: null,
+            configuringTemplate: @js(old('template_slug')),
+            category: 'all',
+            query: '',
+            matches(name, group) {
+                return (this.category === 'all' || this.category === group)
+                    && (name + ' ' + group).toLowerCase().includes(this.query.trim().toLowerCase());
+            }
+        }"
         x-effect="document.body.classList.toggle('overflow-hidden', activeTemplate !== null || configuringTemplate !== null)"
         @keydown.escape.window="activeTemplate = null; configuringTemplate = null"
     >
         <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-                <p class="text-sm font-bold uppercase tracking-[0.18em] text-teal-700">Resume Templates</p>
-                <h1 class="mt-2 text-3xl font-black">{{ $templateCount }} polished resume layouts</h1>
-                <p class="mt-3 max-w-2xl text-sm leading-6 text-neutral-600">A clean resume template workspace with ATS-friendly, sidebar, photo-style, executive, academic, technical, and creative layouts.</p>
+                <p class="text-sm font-bold uppercase tracking-[0.18em] text-brand-700">Resume Templates</p>
+                <h1 class="mt-2 text-3xl font-bold tracking-tight">{{ $templateCount }} polished resume layouts</h1>
+                <p class="mt-3 max-w-2xl text-sm leading-6 text-neutral-600">Find a layout that feels like you. Explore modern, executive, creative, and minimal designs with sample profiles from the US and Europe.</p>
             </div>
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <form method="GET" action="{{ route('templates.index') }}" class="flex w-full items-center gap-2 rounded-lg border border-black/10 bg-white p-2 shadow-sm sm:w-auto">
-                    <label for="template-sort" class="px-2 text-xs font-black uppercase tracking-[0.16em] text-neutral-500">Sort</label>
-                    <select id="template-sort" name="sort" onchange="this.form.submit()" class="h-10 min-w-0 flex-1 rounded-md border border-black/10 bg-white px-3 text-sm font-bold text-neutral-800 outline-none focus:border-teal-700 sm:min-w-48">
+                <form method="GET" action="{{ route('templates.index') }}" class="flex w-full items-center gap-2 rounded-lg border border-line bg-white p-2 shadow-sm sm:w-auto">
+                    <label for="template-sort" class="px-2 text-xs font-black uppercase tracking-[0.16em] text-muted">Sort</label>
+                    <select id="template-sort" name="sort" onchange="this.form.submit()" class="h-10 min-w-0 flex-1 rounded-md border border-line bg-white px-3 text-sm font-bold text-neutral-800 outline-none focus:border-brand-600 sm:min-w-48">
                         @foreach ($sortOptions ?? ['default' => 'Default'] as $value => $label)
                             <option value="{{ $value }}" @selected($sort === $value)>{{ $label }}</option>
                         @endforeach
                     </select>
                 </form>
-                <a href="{{ route('resumes.create') }}" class="inline-flex h-12 w-full items-center justify-center rounded-lg bg-neutral-950 px-5 text-sm font-black text-white sm:w-auto">Create Resume</a>
+                <a href="{{ route('resumes.create') }}" class="inline-flex h-12 w-full items-center justify-center rounded-lg bg-brand-700 px-5 text-sm font-black text-white sm:w-auto">Create Resume</a>
             </div>
+        </div>
+
+        <div class="mt-7 rounded-2xl border border-line bg-white p-4 sm:p-5">
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div class="flex flex-wrap gap-2" aria-label="Filter templates by category">
+                    <button type="button" @click="category = 'all'" :aria-pressed="category === 'all'" :class="category === 'all' ? 'bg-brand-700 text-white' : 'bg-slate-50 text-muted hover:bg-brand-50'" class="rounded-full px-4 py-2 text-xs font-semibold transition">All templates</button>
+                    @foreach ($templates->flatten(1)->pluck('category')->filter()->unique()->sort() as $templateCategory)
+                        <button type="button" @click="category = @js($templateCategory)" :aria-pressed="category === @js($templateCategory)" :class="category === @js($templateCategory) ? 'bg-brand-700 text-white' : 'bg-slate-50 text-muted hover:bg-brand-50'" class="rounded-full px-4 py-2 text-xs font-semibold transition">{{ $templateCategory }}</button>
+                    @endforeach
+                </div>
+                <label class="relative block shrink-0 lg:w-60">
+                    <span class="sr-only">Search templates</span>
+                    <input type="search" x-model.debounce.150ms="query" placeholder="Search templates…" class="w-full rounded-xl border border-line bg-white px-4 py-2.5 text-sm placeholder:text-slate-400 focus:border-brand-400">
+                </label>
+            </div>
+            <p class="mt-4 border-t border-line pt-3 text-xs leading-5 text-muted">Sample names, experience, and contact details are fictional. Your own information appears in the resume editor.</p>
+        </div>
+        <div x-cloak x-show="!@js($templates->flatten(1)->map(fn ($template) => ['name' => $template->name, 'category' => $template->category])->values()).some(item => matches(item.name, item.category))" class="mt-8 rounded-2xl border border-dashed border-line bg-white p-10 text-center">
+            <h2 class="font-semibold text-ink">No matching templates</h2>
+            <p class="mt-2 text-sm text-muted">Try another name or choose a different category.</p>
+            <button type="button" @click="category = 'all'; query = ''" class="mt-4 text-sm font-semibold text-brand-700">Clear filters</button>
         </div>
 
         <div class="mt-8 space-y-10">
             @foreach ($templates as $category => $items)
-                <section>
+                <section x-show="@js($items->map(fn ($template) => ['name' => $template->name, 'category' => $template->category])->values()).some(item => matches(item.name, item.category))">
                     @if ($sort === 'category')
                         <div class="flex items-center justify-between gap-4">
                             <h2 class="text-xl font-black">{{ $category }}</h2>
-                            <span class="rounded-full bg-white px-3 py-1 text-xs font-bold text-neutral-500">{{ $items->count() }} layouts</span>
+                            <span class="rounded-full bg-white px-3 py-1 text-xs font-bold text-muted">{{ $items->count() }} layouts</span>
                         </div>
                     @endif
 
@@ -55,7 +85,7 @@
                                     'Creative' => 'Brand Designer',
                                     'Technical' => 'Backend Developer',
                                     'Academic', 'Graduate' => 'Research Assistant',
-                                    default => 'Credit Analyst',
+                                    default => 'Business Analyst',
                                 };
                                 $defaultSpacing = match (data_get($template->settings, 'density')) {
                                     'compact' => 'compact',
@@ -63,21 +93,21 @@
                                     default => 'comfortable',
                                 };
                             @endphp
-                            <article class="group relative overflow-hidden rounded-lg border border-black/10 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-xl">
-                                <div class="relative">
-                                    <x-resume-template-thumbnail :template="$template" class="rounded-none border-0 shadow-none" />
-                                    <div class="pointer-events-none absolute inset-0 flex items-center justify-center bg-neutral-950/0 opacity-0 transition duration-200 group-hover:bg-neutral-950/35 group-hover:opacity-100">
-                                        <span class="rounded-full bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-neutral-950 shadow-sm">Preview</span>
+                            <article x-show="matches(@js($template->name), @js($template->category))" class="group relative overflow-hidden rounded-2xl border border-line bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:border-brand-200 hover:shadow-xl hover:shadow-brand-900/5">
+                                <div class="relative border-b border-line bg-linear-to-b from-slate-50 to-brand-50/40 p-4">
+                                    <x-resume-template-thumbnail :template="$template" height-class="aspect-[210/297] h-auto" class="rounded-md" />
+                                    <div class="pointer-events-none absolute inset-0 flex items-center justify-center bg-brand-700/0 opacity-0 transition duration-200 group-hover:bg-brand-700/35 group-hover:opacity-100">
+                                        <span class="rounded-full bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-ink shadow-sm">Preview</span>
                                     </div>
                                 </div>
                                 <div class="flex items-start justify-between gap-4 p-4">
                                     <div>
-                                        <p class="font-black">{{ $template->name }}</p>
-                                        <p class="mt-1 text-sm text-neutral-500">{{ str($template->layout)->headline() }}</p>
+                                        <p class="font-semibold tracking-tight text-ink">{{ $template->name }}</p>
+                                        <p class="mt-1 text-xs text-muted">{{ $template->category }} · {{ str($template->layout)->headline() }}</p>
                                     </div>
-                                    <span class="shrink-0 rounded-md border border-black/10 px-3 py-2 text-xs font-black text-neutral-700 group-hover:bg-[#f6f7f9]">Preview</span>
+                                    <span class="shrink-0 rounded-md border border-line px-3 py-2 text-xs font-black text-neutral-700 group-hover:bg-cream">Preview</span>
                                 </div>
-                                <button type="button" class="absolute inset-0 z-10 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2" @click="activeTemplate = @js($template->slug)">
+                                <button type="button" class="absolute inset-0 z-10 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2" @click="activeTemplate = @js($template->slug)">
                                     <span class="sr-only">Preview {{ $template->name }}</span>
                                 </button>
                             </article>
@@ -86,56 +116,56 @@
                                 x-cloak
                                 x-show="activeTemplate === @js($template->slug)"
                                 x-transition.opacity
-                                class="fixed inset-0 z-50 overflow-y-auto bg-neutral-950/65 p-4 backdrop-blur-sm sm:p-6"
+                                class="fixed inset-0 z-50 overflow-y-auto bg-brand-700/65 p-4 backdrop-blur-sm sm:p-6"
                                 role="dialog"
                                 aria-modal="true"
                                 aria-labelledby="template-preview-{{ $template->id }}"
                                 @click.self="activeTemplate = null"
                             >
                                 <div class="mx-auto flex min-h-full max-w-6xl items-center justify-center">
-                                    <div class="w-full overflow-hidden rounded-lg bg-white shadow-2xl" @click.stop>
-                                        <header class="flex items-start justify-between gap-4 border-b border-black/10 p-5">
+                                    <div class="w-full overflow-hidden rounded-2xl bg-white shadow-2xl" @click.stop>
+                                        <header class="flex items-start justify-between gap-4 border-b border-line p-5">
                                             <div>
-                                                <p class="text-xs font-black uppercase tracking-[0.18em] text-teal-700">Template Preview</p>
+                                                <p class="text-xs font-black uppercase tracking-[0.18em] text-brand-700">Template Preview</p>
                                                 <h2 id="template-preview-{{ $template->id }}" class="mt-1 text-2xl font-black">{{ $template->name }}</h2>
-                                                <p class="mt-1 text-sm text-neutral-500">{{ $template->category }} &middot; {{ str($template->layout)->headline() }}</p>
+                                                <p class="mt-1 text-sm text-muted">{{ $template->category }} &middot; {{ str($template->layout)->headline() }}</p>
                                             </div>
-                                            <button type="button" class="rounded-md border border-black/10 px-3 py-2 text-xs font-black text-neutral-600 hover:bg-[#f6f7f9]" @click="activeTemplate = null">Close</button>
+                                            <button type="button" class="rounded-md border border-line px-3 py-2 text-xs font-black text-neutral-600 hover:bg-cream" @click="activeTemplate = null">Close</button>
                                         </header>
 
                                         <div class="grid gap-6 p-5 lg:grid-cols-[minmax(21rem,1fr)_minmax(17rem,0.55fr)]">
-                                            <div class="flex justify-center rounded-lg bg-[#f6f7f9] p-4">
+                                            <div class="flex justify-center rounded-lg bg-cream p-4">
                                                 <x-resume-template-thumbnail :template="$template" :preview="true" class="mx-auto w-full max-w-[30rem] rounded-md shadow-lg" />
                                             </div>
 
                                             <aside class="flex flex-col gap-5">
                                                 <div>
-                                                    <p class="text-sm font-black uppercase tracking-[0.16em] text-neutral-500">Layout</p>
+                                                    <p class="text-sm font-black uppercase tracking-[0.16em] text-muted">Layout</p>
                                                     <p class="mt-2 text-lg font-black">{{ str($template->layout)->headline() }}</p>
                                                     <p class="mt-2 text-sm leading-6 text-neutral-600">{{ $template->name }} keeps your profile, experience, education, skills, and contact details in a polished resume structure.</p>
                                                 </div>
 
                                                 <dl class="grid gap-3 text-sm">
-                                                    <div class="flex items-center justify-between gap-4 border-b border-black/10 pb-3">
-                                                        <dt class="font-bold text-neutral-500">Category</dt>
+                                                    <div class="flex items-center justify-between gap-4 border-b border-line pb-3">
+                                                        <dt class="font-bold text-muted">Category</dt>
                                                         <dd class="font-black">{{ $template->category }}</dd>
                                                     </div>
-                                                    <div class="flex items-center justify-between gap-4 border-b border-black/10 pb-3">
-                                                        <dt class="font-bold text-neutral-500">Font</dt>
+                                                    <div class="flex items-center justify-between gap-4 border-b border-line pb-3">
+                                                        <dt class="font-bold text-muted">Font</dt>
                                                         <dd class="font-black">{{ $template->font_family }}</dd>
                                                     </div>
-                                                    <div class="flex items-center justify-between gap-4 border-b border-black/10 pb-3">
-                                                        <dt class="font-bold text-neutral-500">Accent</dt>
+                                                    <div class="flex items-center justify-between gap-4 border-b border-line pb-3">
+                                                        <dt class="font-bold text-muted">Accent</dt>
                                                         <dd class="flex items-center gap-2 font-black">
-                                                            <span class="h-4 w-4 rounded-full border border-black/10" style="background: {{ $template->accent_color }}"></span>
+                                                            <span class="h-4 w-4 rounded-full border border-line" style="background: {{ $template->accent_color }}"></span>
                                                             {{ $template->accent_color }}
                                                         </dd>
                                                     </div>
                                                 </dl>
 
-                                                <div class="mt-auto flex flex-col gap-3 border-t border-black/10 pt-5">
-                                                    <button type="button" class="inline-flex h-12 items-center justify-center rounded-lg bg-neutral-950 px-5 text-sm font-black text-white" @click="configuringTemplate = @js($template->slug); activeTemplate = null">Use this template</button>
-                                                    <button type="button" class="inline-flex h-12 items-center justify-center rounded-lg border border-black/10 px-5 text-sm font-black text-neutral-700 hover:bg-[#f6f7f9]" @click="activeTemplate = null">Back to templates</button>
+                                                <div class="mt-auto flex flex-col gap-3 border-t border-line pt-5">
+                                                    <button type="button" class="inline-flex h-12 items-center justify-center rounded-lg bg-brand-700 px-5 text-sm font-black text-white" @click="configuringTemplate = @js($template->slug); activeTemplate = null">Use this template</button>
+                                                    <button type="button" class="inline-flex h-12 items-center justify-center rounded-lg border border-line px-5 text-sm font-black text-neutral-700 hover:bg-cream" @click="activeTemplate = null">Back to templates</button>
                                                 </div>
                                             </aside>
                                         </div>
@@ -147,44 +177,44 @@
                                 x-cloak
                                 x-show="configuringTemplate === @js($template->slug)"
                                 x-transition.opacity
-                                class="fixed inset-0 z-50 overflow-y-auto bg-neutral-950/65 p-4 backdrop-blur-sm sm:p-6"
+                                class="fixed inset-0 z-50 overflow-y-auto bg-brand-700/65 p-4 backdrop-blur-sm sm:p-6"
                                 role="dialog"
                                 aria-modal="true"
                                 aria-labelledby="template-config-{{ $template->id }}"
                                 @click.self="configuringTemplate = null"
                             >
                                 <div class="mx-auto flex min-h-full max-w-3xl items-center justify-center">
-                                    <form method="POST" action="{{ route('resumes.store') }}" class="w-full overflow-hidden rounded-lg bg-white shadow-2xl" @click.stop>
+                                    <form method="POST" action="{{ route('resumes.store') }}" class="w-full overflow-hidden rounded-2xl bg-white shadow-2xl" @click.stop>
                                         @csrf
                                         <input type="hidden" name="template_id" value="{{ $template->id }}">
                                         <input type="hidden" name="template_slug" value="{{ $template->slug }}">
                                         <input type="hidden" name="font_family" value="{{ $template->font_family }}">
 
-                                        <header class="flex items-start justify-between gap-4 border-b border-black/10 p-5">
+                                        <header class="flex items-start justify-between gap-4 border-b border-line p-5">
                                             <div>
-                                                <p class="text-xs font-black uppercase tracking-[0.18em] text-teal-700">Configuration</p>
+                                                <p class="text-xs font-black uppercase tracking-[0.18em] text-brand-700">Configuration</p>
                                                 <h2 id="template-config-{{ $template->id }}" class="mt-1 text-2xl font-black">{{ $template->name }}</h2>
-                                                <p class="mt-1 text-sm text-neutral-500">{{ $template->category }} &middot; {{ str($template->layout)->headline() }}</p>
+                                                <p class="mt-1 text-sm text-muted">{{ $template->category }} &middot; {{ str($template->layout)->headline() }}</p>
                                             </div>
-                                            <button type="button" class="rounded-md border border-black/10 px-3 py-2 text-xs font-black text-neutral-600 hover:bg-[#f6f7f9]" @click="configuringTemplate = null">Close</button>
+                                            <button type="button" class="rounded-md border border-line px-3 py-2 text-xs font-black text-neutral-600 hover:bg-cream" @click="configuringTemplate = null">Close</button>
                                         </header>
 
                                         <div class="grid gap-5 p-5 sm:grid-cols-2">
                                             <label class="block">
                                                 <span class="text-sm font-semibold">Resume name</span>
-                                                <input name="title" value="{{ $isFailedTemplate ? old('title') : $template->name.' Resume' }}" required class="mt-2 w-full rounded-lg border border-black/10 px-4 py-3 text-sm">
+                                                <input name="title" value="{{ $isFailedTemplate ? old('title') : $template->name.' Resume' }}" required class="mt-2 w-full rounded-lg border border-line px-4 py-3 text-sm">
                                                 <x-field-error name="title" />
                                             </label>
 
                                             <label class="block">
                                                 <span class="text-sm font-semibold">Professional title</span>
-                                                <input name="professional_title" value="{{ $isFailedTemplate ? old('professional_title') : $defaultProfessionalTitle }}" class="mt-2 w-full rounded-lg border border-black/10 px-4 py-3 text-sm">
+                                                <input name="professional_title" value="{{ $isFailedTemplate ? old('professional_title') : $defaultProfessionalTitle }}" class="mt-2 w-full rounded-lg border border-line px-4 py-3 text-sm">
                                                 <x-field-error name="professional_title" />
                                             </label>
 
                                             <label class="block">
                                                 <span class="text-sm font-semibold">Spacing</span>
-                                                <select name="spacing" class="mt-2 w-full rounded-lg border border-black/10 px-4 py-3 text-sm">
+                                                <select name="spacing" class="mt-2 w-full rounded-lg border border-line px-4 py-3 text-sm">
                                                     <option value="compact" @selected(($isFailedTemplate ? old('spacing') : $defaultSpacing) === 'compact')>Compact</option>
                                                     <option value="comfortable" @selected(($isFailedTemplate ? old('spacing') : $defaultSpacing) === 'comfortable')>Comfortable</option>
                                                     <option value="spacious" @selected(($isFailedTemplate ? old('spacing') : $defaultSpacing) === 'spacious')>Spacious</option>
@@ -194,7 +224,7 @@
 
                                             <label class="block">
                                                 <span class="text-sm font-semibold">Accent color</span>
-                                                <span class="mt-2 flex items-center gap-3 rounded-lg border border-black/10 px-4 py-2">
+                                                <span class="mt-2 flex items-center gap-3 rounded-lg border border-line px-4 py-2">
                                                     <input type="color" name="accent_color" value="{{ $isFailedTemplate ? old('accent_color', $template->accent_color) : $template->accent_color }}" class="h-9 w-12 rounded border-0 p-0">
                                                     <span class="text-sm font-bold text-neutral-600">{{ $template->accent_color }}</span>
                                                 </span>
@@ -203,14 +233,14 @@
 
                                             <label class="block sm:col-span-2">
                                                 <span class="text-sm font-semibold">Professional summary</span>
-                                                <textarea name="professional_summary" rows="4" class="mt-2 w-full rounded-lg border border-black/10 px-4 py-3 text-sm">{{ $isFailedTemplate ? old('professional_summary') : '' }}</textarea>
+                                                <textarea name="professional_summary" rows="4" class="mt-2 w-full rounded-lg border border-line px-4 py-3 text-sm">{{ $isFailedTemplate ? old('professional_summary') : '' }}</textarea>
                                                 <x-field-error name="professional_summary" />
                                             </label>
                                         </div>
 
-                                        <footer class="flex flex-col-reverse gap-3 border-t border-black/10 p-5 sm:flex-row sm:justify-between">
-                                            <button type="button" class="inline-flex h-12 items-center justify-center rounded-lg border border-black/10 px-5 text-sm font-black text-neutral-700 hover:bg-[#f6f7f9]" @click="activeTemplate = @js($template->slug); configuringTemplate = null">Back to preview</button>
-                                            <button type="submit" class="inline-flex h-12 items-center justify-center rounded-lg bg-neutral-950 px-5 text-sm font-black text-white">Next to editor</button>
+                                        <footer class="flex flex-col-reverse gap-3 border-t border-line p-5 sm:flex-row sm:justify-between">
+                                            <button type="button" class="inline-flex h-12 items-center justify-center rounded-lg border border-line px-5 text-sm font-black text-neutral-700 hover:bg-cream" @click="activeTemplate = @js($template->slug); configuringTemplate = null">Back to preview</button>
+                                            <button type="submit" class="inline-flex h-12 items-center justify-center rounded-lg bg-brand-700 px-5 text-sm font-black text-white">Next to editor</button>
                                         </footer>
                                     </form>
                                 </div>

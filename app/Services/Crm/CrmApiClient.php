@@ -95,6 +95,6 @@ class CrmApiClient
             ->withHeader('x-api-key', (string) $concept->crm_api_key)
             ->timeout((int) config('services.crm.timeout'))
             ->connectTimeout((int) config('services.crm.timeout'))
-            ->retry((int) config('services.crm.retries'), (int) config('services.crm.retry_sleep_ms'));
+            ->retry((int) config('services.crm.retries'), (int) config('services.crm.retry_sleep_ms'), throw: false);
     }
 }

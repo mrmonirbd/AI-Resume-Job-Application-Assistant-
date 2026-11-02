@@ -99,30 +99,35 @@ class LegalPageController extends Controller
         }
 
         $xpath = new DOMXPath($document);
-        $removableNodes = $xpath->query('.//script | .//style | .//iframe | .//object | .//embed', $root);
+        $removableNodes = $xpath->query('.//script | .//style | .//iframe | .//object | .//embed | .//svg | .//math | .//form | .//input | .//button | .//link | .//meta | .//base', $root);
 
         foreach (iterator_to_array($removableNodes ?: []) as $node) {
             $node->parentNode?->removeChild($node);
         }
 
-        $attributes = $xpath->query('.//@*', $root);
+        $allowedTags = ['p', 'div', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a', 'strong', 'b', 'em', 'i', 'u', 'br', 'hr', 'ul', 'ol', 'li', 'blockquote', 'table', 'thead', 'tbody', 'tr', 'th', 'td'];
 
-        foreach (iterator_to_array($attributes ?: []) as $attribute) {
-            $element = $attribute->ownerElement;
-            $name = strtolower($attribute->nodeName);
-
+        foreach (iterator_to_array($xpath->query('.//*', $root) ?: []) as $element) {
             if (! $element instanceof DOMElement) {
                 continue;
             }
 
-            if ($name === 'style' || $name === 'srcdoc' || str_starts_with($name, 'on')) {
-                $element->removeAttribute($attribute->nodeName);
+            if (! in_array(strtolower($element->tagName), $allowedTags, true)) {
+                $element->parentNode?->removeChild($element);
 
                 continue;
             }
 
-            if (in_array($name, ['href', 'src'], true) && preg_match('/^\s*(?:javascript|data):/i', $attribute->nodeValue)) {
-                $element->removeAttribute($attribute->nodeName);
+            foreach (iterator_to_array($element->attributes) as $attribute) {
+                $name = strtolower($attribute->nodeName);
+                $value = preg_replace('/[\x00-\x20\x7f]+/', '', $attribute->nodeValue) ?? '';
+                $isSafeLink = strtolower($element->tagName) === 'a'
+                    && $name === 'href'
+                    && (str_starts_with($value, '#') || preg_match('~^https?://~i', $value) || preg_match('~^(?:mailto|tel):~i', $value));
+
+                if (! $isSafeLink) {
+                    $element->removeAttribute($attribute->nodeName);
+                }
             }
         }
 

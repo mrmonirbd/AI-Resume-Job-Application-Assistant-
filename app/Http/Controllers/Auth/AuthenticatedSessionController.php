@@ -84,7 +84,7 @@ class AuthenticatedSessionController extends Controller
         $customer = $crm->data($customerResponse);
         $subscription = $this->firstSubscription($crm->data($subscriptionResponse));
 
-        if (! is_array($customer) || ! is_array($subscription)) {
+        if (! is_array($customer) || ! is_array($subscription) || ! is_array($remoteAccount)) {
             throw ValidationException::withMessages([
                 'email' => __('The account service returned incomplete account data.'),
             ]);
@@ -101,13 +101,14 @@ class AuthenticatedSessionController extends Controller
         );
 
         Auth::login($user, $request->boolean('remember'));
-        $request->session()->regenerate();
 
         return $this->redirectForAuthenticatedUser($request);
     }
 
     private function redirectForAuthenticatedUser(Request $request): RedirectResponse
     {
+        $request->session()->regenerate();
+
         if (! $request->user()->hasVerifiedEmail()) {
             return to_route('verification.notice');
         }

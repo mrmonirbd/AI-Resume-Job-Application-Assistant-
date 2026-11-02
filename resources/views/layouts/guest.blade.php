@@ -8,11 +8,11 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
     </head>
-    <body class="min-h-screen bg-[#f6f7f9] text-neutral-950 antialiased">
+    <body class="min-h-screen bg-cream text-ink antialiased">
         <div class="min-h-screen">
             {{ $slot ?? '' }}
             @yield('content')
         </div>
-        @livewireScripts
+        @livewireScriptConfig
     </body>
 </html>

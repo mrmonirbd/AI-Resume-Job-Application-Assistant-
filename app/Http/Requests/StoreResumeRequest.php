@@ -19,8 +19,8 @@ class StoreResumeRequest extends FormRequest
             'professional_title' => ['nullable', 'string', 'max:160'],
             'professional_summary' => ['nullable', 'string', 'max:4000'],
             'template_id' => ['nullable', Rule::exists('resume_templates', 'id')->where('is_active', true)],
-            'accent_color' => ['nullable', 'string', 'max:20'],
-            'font_family' => ['nullable', 'string', 'max:80'],
+            'accent_color' => ['nullable', 'hex_color'],
+            'font_family' => ['nullable', 'string', 'max:80', 'regex:/^[a-zA-Z0-9 ,\-]+$/'],
             'spacing' => ['nullable', 'in:compact,comfortable,spacious'],
         ];
     }

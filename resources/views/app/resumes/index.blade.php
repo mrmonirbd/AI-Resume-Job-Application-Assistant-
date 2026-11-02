@@ -6,37 +6,37 @@
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-                <p class="text-sm font-bold uppercase tracking-[0.18em] text-teal-700">My Resumes</p>
+                <p class="text-sm font-bold uppercase tracking-[0.18em] text-brand-700">My Resumes</p>
                 <h1 class="mt-2 text-3xl font-black">Resume versions</h1>
             </div>
             <div class="flex gap-3">
-                <a href="{{ route('resumes.master') }}" class="rounded-lg border border-black/10 bg-white px-4 py-3 text-sm font-black">Master Resume</a>
-                <a href="{{ route('resumes.create') }}" class="rounded-lg bg-neutral-950 px-4 py-3 text-sm font-black text-white">Create Resume</a>
+                <a href="{{ route('resumes.master') }}" class="rounded-lg border border-line bg-white px-4 py-3 text-sm font-black">Master Resume</a>
+                <a href="{{ route('resumes.create') }}" class="rounded-lg bg-brand-700 px-4 py-3 text-sm font-black text-white">Create Resume</a>
             </div>
         </div>
 
         <div class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             @forelse ($resumes as $resume)
-                <article class="rounded-lg border border-black/10 bg-white p-5 shadow-sm">
+                <article class="rounded-lg border border-line bg-white p-5 shadow-sm">
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <p class="text-lg font-black">{{ $resume->title }}</p>
-                            <p class="mt-1 text-sm text-neutral-500">{{ str($resume->type)->headline() }} · {{ $resume->template?->name ?? 'Default template' }}</p>
+                            <p class="mt-1 text-sm text-muted">{{ str($resume->type)->headline() }} · {{ $resume->template?->name ?? 'Default template' }}</p>
                         </div>
                         @if ($resume->is_master)
-                            <span class="rounded-full bg-teal-50 px-3 py-1 text-xs font-bold text-teal-700">Master</span>
+                            <span class="rounded-full bg-teal-50 px-3 py-1 text-xs font-bold text-brand-700">Master</span>
                         @endif
                     </div>
                     <p class="mt-4 min-h-12 text-sm leading-6 text-neutral-600">{{ $resume->professional_summary ? str($resume->professional_summary)->limit(130) : 'Add summary, experience, skills, and projects in the builder.' }}</p>
                     <div class="mt-5 flex flex-wrap gap-2">
-                        <a href="{{ route('resumes.edit', $resume) }}" class="rounded-lg bg-neutral-950 px-4 py-2 text-sm font-bold text-white">Open</a>
+                        <a href="{{ route('resumes.edit', $resume) }}" class="rounded-lg bg-brand-700 px-4 py-2 text-sm font-bold text-white">Open</a>
                         <form method="POST" action="{{ route('resumes.duplicate', $resume) }}">
                             @csrf
-                            <button class="rounded-lg border border-black/10 px-4 py-2 text-sm font-bold">Duplicate</button>
+                            <button class="rounded-lg border border-line px-4 py-2 text-sm font-bold">Duplicate</button>
                         </form>
                         <div class="relative" x-data="{ open: false }" @keydown.escape.window="open = false">
-                            <button type="button" class="rounded-lg border border-black/10 px-4 py-2 text-sm font-bold" @click="open = ! open" :aria-expanded="open.toString()">Export</button>
-                            <div x-cloak x-show="open" x-transition.origin.top.right @click.outside="open = false" class="absolute bottom-full left-0 z-30 mb-2 w-40 overflow-hidden rounded-lg border border-black/10 bg-white p-1 shadow-xl">
+                            <button type="button" class="rounded-lg border border-line px-4 py-2 text-sm font-bold" @click="open = ! open" :aria-expanded="open.toString()">Export</button>
+                            <div x-cloak x-show="open" x-transition.origin.top.right @click.outside="open = false" class="absolute bottom-full left-0 z-30 mb-2 w-40 overflow-hidden rounded-lg border border-line bg-white p-1 shadow-xl">
                                 <a href="{{ route('resumes.export', $resume) }}" class="block rounded-md px-3 py-2 text-sm font-bold text-neutral-700 hover:bg-black/5">Export as PDF</a>
                                 <a href="{{ route('resumes.export-word', $resume) }}" class="block rounded-md px-3 py-2 text-sm font-bold text-neutral-700 hover:bg-black/5">Export as Word</a>
                                 <a href="{{ route('resumes.export-image', $resume) }}" class="block rounded-md px-3 py-2 text-sm font-bold text-neutral-700 hover:bg-black/5">Export as Image</a>
@@ -45,7 +45,7 @@
                     </div>
                 </article>
             @empty
-                <div class="rounded-lg border border-dashed border-black/15 bg-white p-8 text-sm text-neutral-500">No resumes yet. Create your master resume to start.</div>
+                <div class="rounded-lg border border-dashed border-black/15 bg-white p-8 text-sm text-muted">No resumes yet. Create your master resume to start.</div>
             @endforelse
         </div>
 

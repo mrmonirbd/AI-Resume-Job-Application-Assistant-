@@ -86,7 +86,7 @@ class AIManager
             'model' => $model,
             'prompt_hash' => Str::random(8),
             'request_summary' => 'Structured '.$feature.' request',
-            'response_summary' => Str::limit(json_encode($payload, JSON_THROW_ON_ERROR), 1200),
+            'response_summary' => 'Structured response received; content omitted for privacy.',
             'input_tokens' => $promptTokens,
             'output_tokens' => $completionTokens,
             'total_tokens' => $totalTokens,

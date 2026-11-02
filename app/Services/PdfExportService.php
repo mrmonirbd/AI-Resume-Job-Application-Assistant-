@@ -11,7 +11,7 @@ class PdfExportService
 {
     public function resume(Resume $resume): Response
     {
-        $resume->loadMissing(['user', 'template', 'experiences', 'educations', 'skills', 'projects', 'certifications', 'languages', 'links']);
+        $resume->loadMissing(['user', 'template', 'sections', 'experiences', 'educations', 'skills', 'projects', 'certifications', 'languages', 'links']);
 
         return Pdf::loadView('pdf.resume', ['resume' => $resume])
             ->setPaper('a4')

@@ -6,6 +6,29 @@
 @source '../../app/Livewire/**/*.php';
 
 @theme {
+    --color-brand-50: #f7f3ff;
+    --color-brand-100: #efe8ff;
+    --color-brand-200: #dfd0ff;
+    --color-brand-300: #c4a8ff;
+    --color-brand-400: #a47af8;
+    --color-brand-500: #7a45f0;
+    --color-brand-600: #6934d9;
+    --color-brand-700: #4a2391;
+    --color-brand-800: #3a1b73;
+    --color-brand-900: #2b1650;
+    --color-brand-950: #1d0f35;
+    --color-ink: #1d0f35;
+    --color-body: #2f2645;
+    --color-muted: #6e6787;
+    --color-line: #ece6f5;
+    --color-cream: #fff8f2;
+    --color-apricot: #ff9156;
+    --color-coral: #ff5d7d;
+    --color-coral-soft: #ffe8ed;
+    --color-sea: #13b3a3;
+    --color-sea-soft: #dcf7f3;
+    --color-sun: #ffc947;
+    --color-sun-soft: #fff4d6;
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
@@ -15,10 +38,38 @@
         scroll-behavior: smooth;
     }
 
+    ::selection {
+        background-color: var(--color-coral);
+        color: white;
+    }
+
+    :focus-visible {
+        outline: 3px solid var(--color-apricot);
+        outline-offset: 3px;
+    }
+
     input,
     textarea,
     select {
+        min-width: 0;
+        max-width: 100%;
         background-color: white;
+    }
+
+    button:not(:disabled),
+    summary {
+        cursor: pointer;
+    }
+
+    button:disabled {
+        cursor: wait;
+        opacity: 0.6;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        html {
+            scroll-behavior: auto;
+        }
     }
 
     [x-cloak] {

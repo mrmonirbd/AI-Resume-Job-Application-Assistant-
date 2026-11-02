@@ -16,10 +16,10 @@ class StoreJobRequest extends FormRequest
         return [
             'company' => ['required', 'string', 'max:160'],
             'title' => ['required', 'string', 'max:160'],
-            'job_url' => ['nullable', 'url', 'max:500'],
+            'job_url' => ['nullable', 'url:http,https', 'max:500'],
             'location' => ['nullable', 'string', 'max:160'],
             'salary' => ['nullable', 'string', 'max:120'],
-            'description' => ['required', 'string', 'min:30'],
+            'description' => ['required', 'string', 'min:30', 'max:30000'],
             'notes' => ['nullable', 'string', 'max:5000'],
         ];
     }

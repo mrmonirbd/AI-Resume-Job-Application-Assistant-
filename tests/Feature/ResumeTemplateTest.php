@@ -40,8 +40,13 @@ class ResumeTemplateTest extends TestCase
             ->assertDontSee('Uncategorized')
             ->assertDontSee('Apply')
             ->assertSee('images/demo-profile.svg')
-            ->assertSee('Nusrat Jahan')
-            ->assertSee('Credit Analyst')
+            ->assertSee('John Doe')
+            ->assertSee('Berlin, Germany')
+            ->assertSee('New York, NY')
+            ->assertSee('Search templates')
+            ->assertDontSee('Dhaka')
+            ->assertDontSee('+880')
+            ->assertSee('Business Analyst')
             ->assertSee('Classic Clarity')
             ->assertSee('Black Timeline')
             ->assertSee('Technical Grid')
@@ -379,5 +384,204 @@ class ResumeTemplateTest extends TestCase
             'accent_color' => '#9a6b55',
             'font_family' => 'Georgia',
         ]);
+    }
+
+    public function test_selecting_a_template_updates_preview_without_saving_the_resume(): void
+    {
+        $user = User::factory()->create();
+        $classic = ResumeTemplate::create([
+            'name' => 'Classic preview', 'slug' => 'classic-preview', 'category' => 'Professional',
+            'layout' => 'single-column', 'accent_color' => '#123456', 'font_family' => 'Inter',
+            'settings' => ['style' => 'classic'], 'is_active' => true,
+        ]);
+        $sidebar = ResumeTemplate::create([
+            'name' => 'Sidebar preview', 'slug' => 'sidebar-preview', 'category' => 'Executive',
+            'layout' => 'left-sidebar-dark', 'accent_color' => '#654321', 'font_family' => 'Georgia',
+            'settings' => ['style' => 'sidebar', 'dark' => '#112233'], 'is_active' => true,
+        ]);
+        $resume = $user->resumes()->create([
+            'title' => 'My resume', 'template_id' => $classic->id,
+            'accent_color' => '#123456', 'font_family' => 'Inter',
+        ]);
+
+        Livewire::actingAs($user)->test(ResumeBuilder::class, ['resume' => $resume])
+            ->set('overview.template_id', $sidebar->id)
+            ->assertSet('overview.accent_color', '#654321')
+            ->assertSet('overview.font_family', 'Georgia')
+            ->assertSee('background: #112233; color: #ffffff;', false)
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('resumes', [
+            'id' => $resume->id, 'template_id' => $classic->id,
+            'accent_color' => '#123456', 'font_family' => 'Inter',
+        ]);
+    }
+
+    public function test_every_seeded_template_updates_the_live_preview_without_persisting_selection(): void
+    {
+        $this->seed();
+        $user = User::where('email', 'demo@example.com')->firstOrFail();
+        $resume = $user->masterResume()->firstOrFail();
+        ResumeTemplate::create([
+            'name' => 'Operator Compact', 'slug' => 'operator-compact', 'category' => 'Professional',
+            'layout' => 'compact', 'accent_color' => '#334155', 'font_family' => 'Inter',
+            'settings' => ['style' => 'classic', 'soft' => '#e2e8f0'], 'is_active' => true,
+        ]);
+        $originalTemplateId = $resume->template_id;
+        $component = Livewire::actingAs($user)->test(ResumeBuilder::class, ['resume' => $resume]);
+
+        foreach (ResumeTemplate::where('is_active', true)->get() as $template) {
+            $component->set('overview.template_id', $template->id)->assertHasNoErrors();
+            $document = new \DOMDocument;
+            $previousErrors = libxml_use_internal_errors(true);
+            $document->loadHTML($component->html());
+            libxml_clear_errors();
+            libxml_use_internal_errors($previousErrors);
+            $xpath = new \DOMXPath($document);
+            $root = $xpath->query('//*[@data-preview-template="'.$template->slug.'"]')->item(0);
+
+            $this->assertNotNull($root, $template->name.' must be the rendered preview.');
+            $this->assertStringContainsString($user->name, $root->textContent);
+            if ($template->slug === 'operator-compact') {
+                $this->assertGreaterThan(0, $xpath->query('.//header[contains(@class, "grid-cols-")]', $root)->length);
+            }
+
+            $style = data_get($template->settings, 'style');
+            $this->assertSame($style, $root->getAttribute('data-preview-style'));
+
+            $layoutSelectors = [
+                'split' => './/header//div[contains(@class, "min-h-32")]',
+                'balanced' => './/main[contains(@class, "grid-cols-2")]',
+                'compact' => './/main[contains(@class, "grid-cols-2")]',
+                'dense' => './/main[contains(@class, "columns-2")]',
+                'brief' => './/header[contains(@class, "border-l-4")]',
+                'minimal' => './/main[contains(@class, "border-t")]',
+                'editorial' => './/main[contains(@class, "border-l")]',
+                'academic' => './/main/section[1]/h4[text()="Education"]',
+            ];
+
+            if (isset($layoutSelectors[$style])) {
+                $this->assertGreaterThan(0, $xpath->query($layoutSelectors[$style], $root)->length, $template->name.' must render its own layout.');
+            }
+        }
+
+        $this->assertDatabaseHas('resumes', ['id' => $resume->id, 'template_id' => $originalTemplateId]);
+    }
+
+    public function test_overview_typing_updates_preview_without_saving_until_save_is_clicked(): void
+    {
+        $user = User::factory()->create();
+        $resume = $user->resumes()->create([
+            'title' => 'Saved resume', 'professional_title' => 'Saved title',
+            'professional_summary' => 'Saved summary', 'accent_color' => '#123456',
+        ]);
+        $component = Livewire::actingAs($user)->test(ResumeBuilder::class, ['resume' => $resume])
+            ->set('overview.professional_title', 'Draft engineering lead')
+            ->set('overview.professional_summary', 'Draft summary while typing')
+            ->set('overview.accent_color', '#654321');
+
+        $html = $this->documentPreviewHtml($component->html());
+        $this->assertStringContainsString('Draft engineering lead', $html);
+        $this->assertStringContainsString('Draft summary while typing', $html);
+        $this->assertStringContainsString('#654321', $html);
+        $this->assertDatabaseHas('resumes', ['id' => $resume->id, 'professional_title' => 'Saved title', 'professional_summary' => 'Saved summary', 'accent_color' => '#123456']);
+
+        $component->call('saveOverview')->assertHasNoErrors();
+
+        $this->assertDatabaseHas('resumes', ['id' => $resume->id, 'professional_title' => 'Draft engineering lead', 'professional_summary' => 'Draft summary while typing', 'accent_color' => '#654321']);
+    }
+
+    public function test_new_resume_entries_appear_as_drafts_without_database_writes(): void
+    {
+        $user = User::factory()->create();
+        $resume = $user->resumes()->create(['title' => 'Draft resume']);
+        $component = Livewire::actingAs($user)->test(ResumeBuilder::class, ['resume' => $resume])
+            ->set('newSkill.name', 'Draft Kubernetes')
+            ->set('newExperience.company', 'Draft Northstar Labs')
+            ->set('newExperience.position', 'Draft engineer')
+            ->set('newEducation.school', 'Draft university')
+            ->set('newProject.name', 'Draft analytics platform');
+
+        $html = $this->documentPreviewHtml($component->html());
+        foreach (['Draft Kubernetes', 'Draft Northstar Labs', 'Draft engineer', 'Draft university', 'Draft analytics platform'] as $text) {
+            $this->assertStringContainsString($text, $html);
+        }
+        foreach (['skills', 'experiences', 'educations', 'projects'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
+    }
+
+    public function test_saving_a_skill_keeps_other_unsaved_overview_changes(): void
+    {
+        $user = User::factory()->create();
+        $resume = $user->resumes()->create(['title' => 'Saved resume', 'professional_title' => 'Saved title']);
+
+        Livewire::actingAs($user)->test(ResumeBuilder::class, ['resume' => $resume])
+            ->set('overview.professional_title', 'Unsaved title')
+            ->set('newSkill.name', 'Laravel')
+            ->call('addSkill')
+            ->assertHasNoErrors()
+            ->assertSet('overview.professional_title', 'Unsaved title');
+
+        $this->assertDatabaseHas('skills', ['resume_id' => $resume->id, 'name' => 'Laravel']);
+        $this->assertDatabaseHas('resumes', ['id' => $resume->id, 'professional_title' => 'Saved title']);
+    }
+
+    public function test_section_notes_and_visibility_update_preview_without_saving(): void
+    {
+        $user = User::factory()->create();
+        $resume = $user->resumes()->create(['title' => 'Saved resume', 'professional_summary' => 'Original profile summary']);
+        $section = $resume->sections()->create(['type' => 'summary', 'title' => 'Summary', 'is_visible' => true, 'sort_order' => 0]);
+        $component = Livewire::actingAs($user)->test(ResumeBuilder::class, ['resume' => $resume])
+            ->set("sections.{$section->id}.title", 'My profile')
+            ->set("sections.{$section->id}.content", 'Draft note for this section');
+
+        $html = $this->documentPreviewHtml($component->html());
+        $this->assertStringContainsString('My profile', $html);
+        $this->assertStringContainsString('Draft note for this section', $html);
+        $component->set("sections.{$section->id}.is_visible", false);
+        $this->assertStringNotContainsString('Original profile summary', $this->documentPreviewHtml($component->html()));
+        $this->assertDatabaseHas('resume_sections', ['id' => $section->id, 'title' => 'Summary', 'content' => null, 'is_visible' => true]);
+    }
+
+    public function test_accepting_an_ai_suggestion_updates_the_draft_without_saving(): void
+    {
+        $user = User::factory()->create();
+        $resume = $user->resumes()->create(['title' => 'My resume', 'professional_summary' => 'Saved summary']);
+
+        Livewire::actingAs($user)->test(ResumeBuilder::class, ['resume' => $resume])
+            ->set('aiSuggestion', ['ai_rewrite' => 'Reviewed draft summary'])
+            ->call('acceptSuggestion')
+            ->assertSet('overview.professional_summary', 'Reviewed draft summary')
+            ->assertSet('aiSuggestion', null);
+
+        $this->assertDatabaseHas('resumes', ['id' => $resume->id, 'professional_summary' => 'Saved summary']);
+    }
+
+    public function test_custom_color_is_saved_after_selecting_a_different_template(): void
+    {
+        $this->seed();
+        $user = User::where('email', 'demo@example.com')->firstOrFail();
+        $resume = $user->masterResume()->firstOrFail();
+        $template = ResumeTemplate::where('id', '!=', $resume->template_id)->firstOrFail();
+
+        Livewire::actingAs($user)->test(ResumeBuilder::class, ['resume' => $resume])
+            ->set('overview.template_id', $template->id)
+            ->set('overview.accent_color', '#abcdef')
+            ->call('saveOverview')->assertHasNoErrors();
+
+        $this->assertDatabaseHas('resumes', ['id' => $resume->id, 'template_id' => $template->id, 'accent_color' => '#abcdef']);
+    }
+
+    private function documentPreviewHtml(string $html): string
+    {
+        $document = new \DOMDocument;
+        $previousErrors = libxml_use_internal_errors(true);
+        $document->loadHTML($html);
+        libxml_clear_errors();
+        libxml_use_internal_errors($previousErrors);
+        $preview = (new \DOMXPath($document))->query('//*[@data-preview-template]')->item(0);
+
+        return $document->saveHTML($preview);
     }
 }

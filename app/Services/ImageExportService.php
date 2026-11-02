@@ -13,7 +13,7 @@ class ImageExportService
     public function resume(Resume $resume): Response
     {
         $resume->loadMissing([
-            'user', 'template', 'experiences', 'educations', 'skills', 'projects', 'certifications',
+            'user', 'template', 'sections', 'experiences', 'educations', 'skills', 'projects', 'certifications',
             'languages', 'links',
         ]);
 
@@ -24,7 +24,7 @@ class ImageExportService
         }
 
         $imagePrefix = $temporaryPdfPath.'-page';
-        $imagePath = $imagePrefix.'-1.png';
+        $imagePath = $imagePrefix.'.png';
 
         try {
             file_put_contents(
@@ -32,7 +32,7 @@ class ImageExportService
                 Pdf::loadView('pdf.resume', ['resume' => $resume])->setPaper('a4')->output()
             );
 
-            Process::run(['pdftoppm', '-png', '-r', '150', $temporaryPdfPath, $imagePrefix])->throw();
+            Process::run(['pdftoppm', '-f', '1', '-singlefile', '-png', '-r', '150', $temporaryPdfPath, $imagePrefix])->throw();
 
             $image = file_get_contents($imagePath);
 
