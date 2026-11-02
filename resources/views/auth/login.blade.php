@@ -3,7 +3,7 @@
 @section('content')
     <div class="flex min-h-screen items-center justify-center px-5 py-12">
         <div class="w-full max-w-md rounded-lg border border-line bg-white p-8 shadow-sm">
-            <a href="{{ route('landing') }}" class="flex items-center gap-3">
+            <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
                 <span class="grid h-10 w-10 place-items-center rounded-lg bg-brand-700 text-sm font-black text-white">AI</span>
                 <span class="font-bold">Resume Assistant</span>
             </a>

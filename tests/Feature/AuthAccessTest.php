@@ -33,4 +33,43 @@ class AuthAccessTest extends TestCase
 
         $this->assertAuthenticatedAs(User::where('email', 'demo@example.com')->first());
     }
+
+    public function test_login_screen_renders_without_a_landing_route(): void
+    {
+        $this->get(route('login'))->assertOk()->assertSee('Welcome back');
+    }
+
+    public function test_authenticated_users_see_the_dashboard_at_the_root_url(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->get('/')->assertOk()->assertViewIs('app.dashboard');
+        $this->get('/dashboard')->assertRedirect(route('dashboard'));
+        $this->get(route('login'))->assertRedirect(route('dashboard'));
+    }
+
+    public function test_logout_invalidates_the_session_and_redirects_to_login(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->withSession(['private_draft' => 'Unsaved draft'])
+            ->post(route('logout'))
+            ->assertRedirect(route('login'))
+            ->assertSessionMissing('private_draft');
+
+        $this->assertGuest();
+        $this->get(route('login'))->assertOk();
+        $this->get('/')->assertRedirect(route('login'));
+    }
+
+    public function test_deleting_an_account_redirects_to_login(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->delete(route('profile.destroy'), ['password' => 'password'])
+            ->assertRedirect(route('login'));
+
+        $this->assertGuest();
+        $this->assertModelMissing($user);
+    }
 }

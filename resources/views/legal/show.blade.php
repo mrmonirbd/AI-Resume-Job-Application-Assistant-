@@ -41,7 +41,7 @@
     @if (auth()->guest())
         <header class="sticky top-0 z-20 border-b border-line bg-white/95 px-5 py-4 backdrop-blur lg:hidden">
             <div class="flex items-center justify-between gap-4">
-                <a href="{{ route('landing') }}" class="flex items-center gap-3 font-bold">
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 font-bold">
                     <span class="grid h-9 w-9 place-items-center rounded-md bg-brand-700 text-xs font-black text-white">AI</span>
                     <span>{{ $brand }}</span>
                 </a>
@@ -50,7 +50,7 @@
         </header>
 
         <aside class="fixed inset-y-0 left-0 z-30 hidden w-72 flex-col overflow-y-auto border-r border-line bg-white p-5 lg:flex">
-            <a href="{{ route('landing') }}" class="flex items-center gap-3">
+            <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
                 <span class="grid h-10 w-10 place-items-center rounded-lg bg-brand-700 text-sm font-black text-white">AI</span>
                 <span>
                     <span class="block text-sm font-bold">{{ $brand }}</span>

@@ -3,7 +3,7 @@
 @section('content')
     <header class="absolute inset-x-0 top-0 z-20">
         <div class="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-8">
-            <a href="{{ route('landing') }}" class="flex items-center gap-3 text-white">
+            <a href="{{ route('dashboard') }}" class="flex items-center gap-3 text-white">
                 <span class="grid h-10 w-10 place-items-center rounded-lg bg-white text-sm font-black text-ink">AI</span>
                 <span class="text-sm font-bold">Resume Assistant</span>
             </a>
