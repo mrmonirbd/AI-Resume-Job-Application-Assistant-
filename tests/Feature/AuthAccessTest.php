@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use Database\Seeders\ConceptSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class AuthAccessTest extends TestCase
@@ -23,9 +24,12 @@ class AuthAccessTest extends TestCase
         ])->assertNotFound();
     }
 
-    public function test_seeded_demo_user_can_log_in_without_onboarding(): void
+    public function test_seeded_user_with_cmp_subscription_can_log_in_without_onboarding(): void
     {
+        config(['services.crm.api_url' => 'https://crm.example.test', 'services.crm.api_key' => 'test-key']);
         $this->seed();
+        User::where('email', 'demo@example.com')->firstOrFail()->update(['domain_name' => 'localhost', 'crm_customer_id' => 'demo-customer']);
+        Http::fake(['*' => Http::response(['status' => 'success', 'data' => []])]);
 
         $this->post(route('login'), [
             'email' => 'demo@example.com',

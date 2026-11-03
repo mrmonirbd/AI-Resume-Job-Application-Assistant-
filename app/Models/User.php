@@ -18,6 +18,8 @@ class User extends Authenticatable implements MustVerifyEmail
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    private bool $legacyLoginPayload = false;
+
     protected $fillable = [
         'name',
         'email',
@@ -45,6 +47,10 @@ class User extends Authenticatable implements MustVerifyEmail
     protected static function booted(): void
     {
         static::saving(function (User $user): void {
+            if ($user->legacyLoginPayload && filled($user->crm_customer_id)) {
+                $user->email_verified_at ??= now();
+                $user->onboarding_completed_at ??= now();
+            }
             $customer = request()->attributes->get('legacy_cmp_customer');
             if (is_array($customer) && filled($user->crm_customer_id)) {
                 $user->crm_profile = [
@@ -104,6 +110,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function setPlainPasswordAttribute(mixed $value): void
     {
+        $this->legacyLoginPayload = true;
         unset($this->attributes['plain_password']);
     }
 

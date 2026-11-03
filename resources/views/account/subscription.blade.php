@@ -6,7 +6,7 @@
     @php
         $data = $remoteSubscription ?? [];
         $field = fn (string $key, mixed $fallback = 'Not available') => data_get($data, $key, $fallback);
-        $status = $field('status', $subscription?->status ?? 'not linked');
+        $status = $field('status', $subscription?->status ?? 'Demo');
         $price = trim((string) $field('price', data_get($data, 'amount', '')));
         $currency = (string) $field('currency', '');
     @endphp
@@ -20,7 +20,7 @@
                 <div class="p-6">
                     @error('subscription')<p class="mb-5 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{{ $message }}</p>@enderror
                     <div class="grid gap-4 sm:grid-cols-2">
-                        @foreach ([['Subscription number', $field('id', $user->crm_subscription_id ?? 'Not linked')], ['Name', $field('name', $subscription?->plan?->name ?? 'CRM plan')], ['Type', $field('type')], ['Status', $status], ['Price', trim($price.' '.$currency) ?: 'Not available'], ['Interval', ($interval = $field('interval', '')) !== '' ? $interval.' days' : 'Not available']] as [$label, $value])
+                        @foreach ([['Subscription number', $field('id', $user->crm_subscription_id ?? 'Demo_SUBcf45548WSUZPAL49FH')], ['Name', $field('name', $subscription?->plan?->name ?? 'Demo Plan')], ['Type', $field('type')], ['Status', $status], ['Price', trim($price.' '.$currency) ?: '0.00 USD'], ['Interval', ($interval = $field('interval', '')) !== '' ? $interval.' days' : '30 days']] as [$label, $value])
                             <label class="block"><span class="text-sm font-semibold">{{ $label }}</span><input value="{{ $value }}" disabled class="mt-2 w-full rounded-md border border-line bg-neutral-50 px-4 py-3 text-sm text-neutral-600"></label>
                         @endforeach
                     </div>

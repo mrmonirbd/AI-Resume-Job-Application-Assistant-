@@ -10,6 +10,8 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        require_once __DIR__.'/CmpCurlFake.php';
+
         $this->withoutVite();
     }
 }

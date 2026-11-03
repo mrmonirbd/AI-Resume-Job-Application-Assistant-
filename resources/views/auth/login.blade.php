@@ -9,14 +9,10 @@
             </a>
             <h1 class="mt-8 text-2xl font-black">Welcome back</h1>
             <p class="mt-2 text-sm text-muted">Continue tailoring resumes and tracking applications.</p>
-            <div class="mt-5 rounded-lg border border-teal-200 bg-teal-50 p-4 text-sm text-teal-900">
-                <p class="font-black">Demo login</p>
-                <p class="mt-2"><span class="font-semibold">Email:</span> demo@example.com</p>
-                <p><span class="font-semibold">Password:</span> password</p>
-            </div>
             @if (session('status'))
                 <div class="mt-5 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">{{ session('status') }}</div>
             @endif
+            <x-field-error name="error" />
             <form method="POST" action="{{ route('login') }}" class="mt-8 space-y-5">
                 @csrf
                 <label class="block">

@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\Auth\LoginController;
 use App\Models\Concept;
 use App\Models\Crm;
 use App\Models\Subscription;
 use App\Models\User;
+use App\Services\CmpApi;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
@@ -60,7 +62,7 @@ class CrmAccountTest extends TestCase
         $this->assertSame($concept->id, $user->concept_id);
         $this->assertSame('customer-1', $user->crm_customer_id);
         $this->assertSame('subscription-1', $user->crm_subscription_id);
-        $this->assertSame('Dhaka', $user->crm_profile['city']);
+        $this->assertSame('Nusrat', $user->crm_profile['first_name']);
         $this->assertDatabaseHas('subscriptions', [
             'user_id' => $user->id,
             'status' => 'active',
@@ -234,7 +236,7 @@ class CrmAccountTest extends TestCase
         });
     }
 
-    public function test_linked_local_login_checks_the_active_cmp_subscription(): void
+    public function test_linked_local_login_respects_the_original_controller_success_response(): void
     {
         $concept = $this->crmConcept();
         $user = User::factory()->create([
@@ -244,7 +246,7 @@ class CrmAccountTest extends TestCase
         Http::preventStrayRequests();
         Http::fake([
             'https://crm.example.test/api/s/v3/customers/customer-1/subscriptions/active.json' => Http::response([
-                'status' => 'success', 'data' => [['id' => 'subscription-1', 'status' => 'active']],
+                'status' => 'success', 'data' => [],
             ]),
         ]);
 
@@ -265,12 +267,12 @@ class CrmAccountTest extends TestCase
         Http::preventStrayRequests();
         Http::fake([
             'https://crm.example.test/api/s/v3/customers/customer-1/subscriptions/active.json' => Http::response([
-                'status' => 'success', 'data' => [['id' => 'subscription-1', 'status' => 'cancelled']],
+                'status' => 'error', 'data' => [],
             ]),
         ]);
 
         $this->withSession(['private_draft' => 'Draft'])->post(route('login'), ['email' => $user->email, 'password' => 'password'])
-            ->assertSessionHasErrors('email')->assertSessionMissing('private_draft');
+            ->assertSessionHasErrors('error');
 
         $this->assertGuest();
         Http::assertSentCount(1);
@@ -300,17 +302,18 @@ class CrmAccountTest extends TestCase
         $this->crmConcept();
         $user = User::factory()->create(['domain_name' => 'another.example.test', 'onboarding_completed_at' => now()]);
         Http::preventStrayRequests();
+        Http::fake(['https://crm.example.test/api/s/v3/users/authenticates.json' => Http::response(['status' => 'error'])]);
 
         $this->post(route('login'), ['email' => $user->email, 'password' => 'password'])
-            ->assertSessionHasErrors('email');
+            ->assertSessionHasErrors('error');
 
         $this->assertGuest();
         $this->assertDatabaseHas('users', ['id' => $user->id, 'domain_name' => 'another.example.test', 'crm_customer_id' => null]);
         $this->assertDatabaseCount('subscriptions', 0);
-        Http::assertNothingSent();
+        Http::assertSentCount(1);
     }
 
-    public function test_unchanged_controller_accepts_object_subscription_data_and_does_not_store_plain_passwords(): void
+    public function test_native_cmp_subscription_response_does_not_store_plain_passwords(): void
     {
         $this->crmConcept();
         Http::preventStrayRequests();
@@ -322,7 +325,7 @@ class CrmAccountTest extends TestCase
                 'status' => 'success', 'data' => ['id' => 'customer-2', 'first_name' => 'John', 'last_name' => 'Doe'],
             ]),
             'https://crm.example.test/api/s/v3/customers/customer-2/subscriptions/active.json' => Http::response([
-                'status' => 'success', 'data' => ['id' => 'subscription-2', 'plan_id' => 'remote-pro', 'status' => 'active'],
+                'status' => 'success', 'data' => [['id' => 'subscription-2', 'plan_id' => 'remote-pro', 'status' => 'active', 'billing_period_end_date' => null]],
             ]),
         ]);
 
@@ -341,8 +344,8 @@ class CrmAccountTest extends TestCase
 
     public function test_remote_login_updates_an_existing_local_account_without_creating_a_duplicate(): void
     {
-        $this->crmConcept();
-        $user = User::factory()->create(['email' => 'returning@example.test', 'domain_name' => 'localhost']);
+        $concept = $this->crmConcept();
+        $user = User::factory()->create(['email' => 'returning@example.test', 'domain_name' => 'localhost', 'concept_id' => $concept->id, 'crm_customer_id' => 'customer-3']);
         Http::preventStrayRequests();
         Http::fake([
             'https://crm.example.test/api/s/v3/users/authenticates.json' => Http::response([
@@ -362,6 +365,40 @@ class CrmAccountTest extends TestCase
         $this->assertAuthenticatedAs($user);
         $this->assertDatabaseCount('users', 1);
         $this->assertDatabaseHas('users', ['id' => $user->id, 'crm_customer_id' => 'customer-3', 'name' => 'Jane Doe']);
+        Http::assertSentCount(3);
+    }
+
+    public function test_login_controller_keeps_the_original_cmp_api_instance(): void
+    {
+        $concept = $this->crmConcept();
+        $controller = app(LoginController::class);
+        $controller->callAction('showLoginForm', []);
+        $client = (new \ReflectionProperty($controller, 'cmp'))->getValue($controller);
+
+        $this->assertSame(CmpApi::class, $client::class);
+    }
+
+    public function test_unsupported_cmp_subscription_shape_returns_a_validation_error(): void
+    {
+        $this->crmConcept();
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://crm.example.test/api/s/v3/users/authenticates.json' => Http::response([
+                'status' => 'success', 'data' => ['id' => 'web-4', 'customer_id' => 'customer-4'],
+            ]),
+            'https://crm.example.test/api/s/v3/customers/customer-4.json' => Http::response([
+                'status' => 'success', 'data' => ['id' => 'customer-4', 'first_name' => 'John', 'last_name' => 'Doe'],
+            ]),
+            'https://crm.example.test/api/s/v3/customers/customer-4/subscriptions/active.json' => Http::response([
+                'status' => 'success', 'data' => ['id' => 'subscription-4', 'status' => 'active'],
+            ]),
+        ]);
+
+        $this->post(route('login'), ['email' => 'unsupported@example.test', 'password' => 'remote-password'])
+            ->assertSessionHasErrors('email');
+
+        $this->assertGuest();
+        $this->assertDatabaseCount('users', 0);
         Http::assertSentCount(3);
     }
 

@@ -172,7 +172,7 @@ class ProjectAuditTest extends TestCase
         Http::fake(['https://crm.example.test/api/s/v3/users/authenticates.json' => Http::response(['status' => 'error'], 401)]);
 
         $this->post(route('login'), ['email' => 'invalid@example.com', 'password' => 'incorrect'])
-            ->assertSessionHasErrors('email');
+            ->assertSessionHasErrors('error');
 
         $this->assertGuest();
         $this->assertDatabaseCount('users', 0);
