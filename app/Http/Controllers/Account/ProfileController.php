@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Account;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\CmpApi;
 use App\Services\ConceptResolver;
 use App\Services\Crm\CrmApiClient;
 use Illuminate\Http\Client\ConnectionException;
@@ -91,7 +92,7 @@ class ProfileController extends Controller
         return view('account.security', ['user' => $request->user()]);
     }
 
-    public function password(Request $request, ConceptResolver $conceptResolver, CrmApiClient $crm): RedirectResponse
+    public function password(Request $request, ConceptResolver $conceptResolver): RedirectResponse
     {
         $validated = $request->validate([
             'current_password' => ['required', 'current_password'],
@@ -101,19 +102,19 @@ class ProfileController extends Controller
         $user = $request->user();
         $concept = $user->concept ?? $conceptResolver->forRequest($request);
 
-        if ($crm->isConfigured($concept) && filled($user->crm_web_user_id)) {
-            try {
-                $response = $crm->updatePassword($concept, $user->crm_web_user_id, $validated['password']);
-            } catch (ConnectionException) {
-                return back()->withErrors(['password' => 'We could not update your CRM password. Please try again.']);
+        if (filled($user->crm_web_user_id) || filled($user->crm_customer_id)) {
+            if (! $concept || blank($concept->crm?->api_url) || blank($concept->crm_api_key) || blank($user->crm_web_user_id)) {
+                return back()->withErrors(['password' => 'Your linked account is not configured for password updates. Please contact support.']);
             }
 
-            if (! $crm->isSuccessful($response)) {
-                return back()->withErrors(['password' => 'The CRM could not update your password. Please try again.']);
+            $cmp = new CmpApi($concept);
+            $response = $cmp->updatepassword($user->crm_web_user_id, $validated['password']);
+            if (! is_object($response) || ($response->status ?? null) !== 'success') {
+                return back()->withErrors(['password' => 'We could not update your account password. Please try again.']);
             }
         }
 
-        $user->update(['password' => Hash::make($validated['password'])]);
+        $user->forceFill(['password' => Hash::make($validated['password'])])->save();
 
         return back()->with('status', 'Password changed.');
     }

@@ -179,22 +179,28 @@ class ProjectAuditTest extends TestCase
         Http::assertSentCount(1);
     }
 
-    public function test_crm_login_rejects_missing_subscription_without_creating_an_account(): void
+    public function test_crm_login_allows_missing_subscription_without_creating_a_subscription(): void
     {
         $this->crmConcept();
         Http::preventStrayRequests();
         Http::fake([
             'https://crm.example.test/api/s/v3/users/authenticates.json' => Http::response(['status' => 'success', 'data' => ['id' => 'web-1', 'customer_id' => 'customer-1']]),
-            'https://crm.example.test/api/s/v3/customers/customer-1.json' => Http::response(['status' => 'success', 'data' => ['id' => 'customer-1']]),
+            'https://crm.example.test/api/s/v3/customers/customer-1.json' => Http::response(['status' => 'success', 'data' => ['id' => 'customer-1', 'first_name' => 'John', 'last_name' => 'Doe']]),
             'https://crm.example.test/api/s/v3/customers/customer-1/subscriptions/active.json' => Http::response(['status' => 'success', 'data' => []]),
         ]);
 
         $this->post(route('login'), ['email' => 'missing@example.com', 'password' => 'password'])
-            ->assertSessionHasErrors('email');
+            ->assertRedirect(route('dashboard'));
 
-        $this->assertGuest();
-        $this->assertDatabaseCount('users', 0);
-        Http::assertSentCount(3);
+        $this->assertAuthenticated();
+        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('subscriptions', 0);
+
+        $this->post(route('logout'));
+        $this->post(route('login'), ['email' => 'missing@example.com', 'password' => 'password'])
+            ->assertRedirect(route('dashboard'));
+        $this->assertAuthenticated();
+        Http::assertSentCount(4);
     }
 
     public function test_legal_policy_removes_active_content_and_obfuscated_javascript_links(): void

@@ -42,7 +42,7 @@ class AuthAccessTest extends TestCase
     public function test_login_screen_renders_without_a_landing_route(): void
     {
         $this->seed(ConceptSeeder::class);
-        $this->get(route('login'))->assertOk()->assertSee('Welcome back');
+        $this->get(route('login'))->assertOk()->assertSee('LOGIN');
     }
 
     public function test_authenticated_users_see_the_dashboard_at_the_root_url(): void

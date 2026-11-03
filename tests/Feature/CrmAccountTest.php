@@ -13,6 +13,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\TestWith;
 use Tests\TestCase;
 
 class CrmAccountTest extends TestCase
@@ -342,7 +343,9 @@ class CrmAccountTest extends TestCase
         Http::assertSentCount(3);
     }
 
-    public function test_remote_login_updates_an_existing_local_account_without_creating_a_duplicate(): void
+    #[TestWith([true])]
+    #[TestWith([false])]
+    public function test_remote_login_updates_an_existing_local_account_without_creating_a_duplicate(bool $hasSubscription): void
     {
         $concept = $this->crmConcept();
         $user = User::factory()->create(['email' => 'returning@example.test', 'domain_name' => 'localhost', 'concept_id' => $concept->id, 'crm_customer_id' => 'customer-3']);
@@ -355,7 +358,7 @@ class CrmAccountTest extends TestCase
                 'status' => 'success', 'data' => ['id' => 'customer-3', 'first_name' => 'Jane', 'last_name' => 'Doe'],
             ]),
             'https://crm.example.test/api/s/v3/customers/customer-3/subscriptions/active.json' => Http::response([
-                'status' => 'success', 'data' => [['id' => 'subscription-3', 'status' => 'active']],
+                'status' => 'success', 'data' => $hasSubscription ? [['id' => 'subscription-3', 'status' => 'active']] : [],
             ]),
         ]);
 

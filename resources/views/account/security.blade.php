@@ -12,6 +12,7 @@
                     @csrf
                     @method('PUT')
                     <h2 class="text-lg font-black">Change password</h2><p class="mt-1 text-sm text-muted">When linked, the password update is also sent to the CRM user account.</p>
+                    <x-field-error name="current_password" />
                     @error('password')<p class="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{{ $message }}</p>@enderror
                     <div class="mt-5 space-y-4"><input type="password" name="current_password" required placeholder="Current password" class="w-full rounded-md border border-line px-4 py-3 text-sm"><input type="password" name="password" required placeholder="New password" class="w-full rounded-md border border-line px-4 py-3 text-sm"><input type="password" name="password_confirmation" required placeholder="Confirm new password" class="w-full rounded-md border border-line px-4 py-3 text-sm"></div>
                     <button class="mt-5 rounded-md bg-brand-700 px-5 py-3 text-sm font-black text-white">Change password</button>
