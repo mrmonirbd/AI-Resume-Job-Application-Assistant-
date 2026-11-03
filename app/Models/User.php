@@ -34,7 +34,83 @@ class User extends Authenticatable implements MustVerifyEmail
         'domain_name',
         'crm_profile',
         'profile_photo_path',
+        'customer_id',
+        'subscription_id',
+        'web_user_id',
+        'firstname',
+        'lastname',
+        'plain_password',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (User $user): void {
+            $customer = request()->attributes->get('legacy_cmp_customer');
+            if (is_array($customer) && filled($user->crm_customer_id)) {
+                $user->crm_profile = [
+                    ...($user->crm_profile ?? []),
+                    'first_name' => (string) ($customer['first_name'] ?? ''),
+                    'last_name' => (string) ($customer['last_name'] ?? ''),
+                    'phone' => (string) ($customer['phone'] ?? ''),
+                    'address' => (string) ($customer['address'] ?? $customer['address_1'] ?? ''),
+                    'city' => (string) ($customer['city'] ?? ''),
+                    'postcode' => (string) ($customer['postcode'] ?? $customer['zip'] ?? $customer['postal_code'] ?? ''),
+                ];
+                $user->email_verified_at ??= now();
+                $user->onboarding_completed_at ??= now();
+            }
+        });
+    }
+
+    public function getCustomerIdAttribute(mixed $value): mixed
+    {
+        return $value ?? ($this->attributes['crm_customer_id'] ?? null);
+    }
+
+    public function setCustomerIdAttribute(mixed $value): void
+    {
+        $this->attributes['customer_id'] = $value;
+        $this->attributes['crm_customer_id'] = $value;
+    }
+
+    public function setCrmCustomerIdAttribute(mixed $value): void
+    {
+        $this->attributes['customer_id'] = $value;
+        $this->attributes['crm_customer_id'] = $value;
+    }
+
+    public function setSubscriptionIdAttribute(mixed $value): void
+    {
+        $this->attributes['crm_subscription_id'] = $value;
+    }
+
+    public function setWebUserIdAttribute(mixed $value): void
+    {
+        $this->attributes['crm_web_user_id'] = $value;
+    }
+
+    public function setFirstnameAttribute(mixed $value): void
+    {
+        $this->crm_profile = [...($this->crm_profile ?? []), 'first_name' => (string) $value];
+    }
+
+    public function setLastnameAttribute(mixed $value): void
+    {
+        $this->crm_profile = [...($this->crm_profile ?? []), 'last_name' => (string) $value];
+    }
+
+    /**
+     * Legacy requests may contain this field; only the password hash is persisted.
+     */
+    public function setPlainPasswordAttribute(mixed $value): void
+    {
+        unset($this->attributes['plain_password']);
+    }
+
+    public function subscription(): HasOne
+    {
+        return $this->hasOne(Subscription::class)->latest('id');
+    }
 
     /**
      * Get the attributes that should be cast.

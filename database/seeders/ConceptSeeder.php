@@ -27,6 +27,7 @@ class ConceptSeeder extends Seeder
             ['domain_name' => strtolower($domain)],
             [
                 'name' => config('services.crm.default_name'),
+                'template_name' => config('app.default_concept'),
                 'crm_id' => $crm?->id,
                 'crm_api_key' => $apiKey,
                 'crm_service_id' => config('services.crm.service_id'),

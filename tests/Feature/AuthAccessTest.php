@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Database\Seeders\ConceptSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -36,11 +37,13 @@ class AuthAccessTest extends TestCase
 
     public function test_login_screen_renders_without_a_landing_route(): void
     {
+        $this->seed(ConceptSeeder::class);
         $this->get(route('login'))->assertOk()->assertSee('Welcome back');
     }
 
     public function test_authenticated_users_see_the_dashboard_at_the_root_url(): void
     {
+        $this->seed(ConceptSeeder::class);
         $user = User::factory()->create();
 
         $this->actingAs($user)->get('/')->assertOk()->assertViewIs('app.dashboard');
@@ -50,6 +53,7 @@ class AuthAccessTest extends TestCase
 
     public function test_logout_invalidates_the_session_and_redirects_to_login(): void
     {
+        $this->seed(ConceptSeeder::class);
         $user = User::factory()->create();
 
         $this->actingAs($user)->withSession(['private_draft' => 'Unsaved draft'])

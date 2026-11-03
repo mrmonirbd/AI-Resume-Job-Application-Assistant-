@@ -10,6 +10,7 @@
         "barryvdh/laravel-dompdf": "^3.1",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
+        "laravel/ui": "^4.6.3",
         "livewire/livewire": "^4.4"
     },
     "require-dev": {

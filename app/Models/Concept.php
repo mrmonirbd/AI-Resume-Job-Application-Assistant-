@@ -18,6 +18,7 @@ class Concept extends Model
         'support_email',
         'support_phone',
         'template',
+        'template_name',
         'is_default',
         'is_enabled',
     ];
@@ -36,6 +37,6 @@ class Concept extends Model
 
     public function crm(): BelongsTo
     {
-        return $this->belongsTo(Crm::class);
+        return $this->belongsTo(Crm::class)->withDefault(['api_url' => '']);
     }
 }

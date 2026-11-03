@@ -2,6 +2,8 @@
 
 return [
 
+    'default_concept' => env('CMP_DEFAULT_CONCEPT', 'resume-assistant'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name

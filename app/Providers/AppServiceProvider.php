@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Services\AI\AIProviderInterface;
 use App\Services\AI\DeepSeekProvider;
+use App\Services\LegacyLoginViewFinder;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -19,6 +20,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(AIProviderInterface::class, DeepSeekProvider::class);
+        $this->app->singleton('view.finder', fn ($app): LegacyLoginViewFinder => new LegacyLoginViewFinder($app['files'], $app['config']['view.paths']));
     }
 
     /**
