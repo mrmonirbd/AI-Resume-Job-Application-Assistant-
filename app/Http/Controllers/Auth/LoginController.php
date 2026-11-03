@@ -72,7 +72,7 @@ class LoginController extends Controller
 
         // Second Attempt: Remote Auth
         $authResponse = $this->cmp->authenticateUser($request, $username, $password);
-        dd($authResponse); 
+        // dd($authResponse->status); 
 
         if ($authResponse->status === 'success') {
             $userData = $authResponse->data;
