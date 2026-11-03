@@ -1,6 +1,8 @@
+import applicationBoard from './application-board';
 import { Livewire, Alpine } from '../../vendor/livewire/livewire/dist/livewire.esm';
 
 window.Alpine = Alpine;
+Alpine.data('applicationBoard', applicationBoard);
 
 window.profilePhotoCropper = (existingPreview) => ({
     cropOpen: false,
