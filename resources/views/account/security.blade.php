@@ -16,12 +16,12 @@
                     <div class="mt-5 space-y-4"><input type="password" name="current_password" required placeholder="Current password" class="w-full rounded-md border border-line px-4 py-3 text-sm"><input type="password" name="password" required placeholder="New password" class="w-full rounded-md border border-line px-4 py-3 text-sm"><input type="password" name="password_confirmation" required placeholder="Confirm new password" class="w-full rounded-md border border-line px-4 py-3 text-sm"></div>
                     <button class="mt-5 rounded-md bg-brand-700 px-5 py-3 text-sm font-black text-white">Change password</button>
                 </form>
-                <form method="POST" action="{{ route('profile.destroy') }}" class="rounded-lg border border-red-200 bg-white p-6 shadow-sm" onsubmit="return confirm('Delete your account permanently?')">
+                {{-- <form method="POST" action="{{ route('profile.destroy') }}" class="rounded-lg border border-red-200 bg-white p-6 shadow-sm" onsubmit="return confirm('Delete your account permanently?')">
                     @csrf
                     @method('DELETE')
                     <h2 class="text-lg font-black text-red-700">Delete account</h2><p class="mt-2 text-sm leading-6 text-neutral-600">This removes your workspace data. Billing changes must be handled from Membership.</p>
                     <input type="password" name="password" required placeholder="Confirm password" class="mt-5 w-full rounded-md border border-line px-4 py-3 text-sm"><button class="mt-5 rounded-md border border-red-300 px-5 py-3 text-sm font-black text-red-700">Delete account</button>
-                </form>
+                </form> --}}
             </div>
         </div>
     </div>
