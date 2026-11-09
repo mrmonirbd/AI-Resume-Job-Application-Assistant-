@@ -98,15 +98,15 @@ class LoginController extends Controller
         $subData = $this->cmp->getSubscriptionDetailByCustomerId($customerId);
         // dd($subData);
 
-        if ($subData->status !== 'success') {
-            $name = $user->name;
-            $email = $user->email;
-            Auth::logout();
+        // if ($subData->status !== 'success') {
+        //     $name = $user->name;
+        //     $email = $user->email;
+        //     Auth::logout();
 
-            return redirect()->route('login')->withErrors([
-                'error' => "Dear {$name}, Your subscription associated with the email address {$email} has ended.",
-            ]);
-        }
+        //     return redirect()->route('login')->withErrors([
+        //         'error' => "Dear {$name}, Your subscription associated with the email address {$email} has ended.",
+        //     ]);
+        // }
 
         return redirect()->route('user.dashboard.index');
     }
