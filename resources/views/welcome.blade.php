@@ -4,8 +4,7 @@
     <header class="absolute inset-x-0 top-0 z-20">
         <div class="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-8">
             <a href="{{ route('dashboard') }}" class="flex items-center gap-3 text-white">
-                <span class="grid h-10 w-10 place-items-center rounded-lg bg-white text-sm font-black text-ink">AI</span>
-                <span class="text-sm font-bold">Resume Assistant</span>
+                <img src="{{ asset('images/cvgenio-logo-light.png') }}" alt="CVGenio" width="900" height="274" class="h-auto w-40">
             </a>
             <nav class="hidden items-center gap-6 text-sm font-semibold text-white/80 md:flex">
                 <a href="#templates" class="hover:text-white">Templates</a>

@@ -9,21 +9,8 @@
                 <h2 class="mt-6 text-4xl font-semibold leading-tight tracking-tight xl:text-5xl">Great opportunities<br>start with <span class="login-gradient-text">your story.</span></h2>
                 <p class="mt-5 max-w-sm text-sm leading-7 text-brand-200">Turn your experience into a resume that opens doors. Keep every application moving forward.</p>
 
-                <div class="relative my-10 px-4 xl:my-12" aria-hidden="true">
-                    <div class="absolute inset-x-8 inset-y-2 rotate-3 rounded-2xl border border-white/15 bg-white/5"></div>
-                    <div class="relative rounded-2xl bg-white p-7 text-slate-800 shadow-2xl xl:p-8">
-                        <div class="flex items-start justify-between border-b border-slate-100 pb-5">
-                            <div><p class="text-xl font-bold tracking-tight">Alex Morgan</p><p class="mt-1 text-xs text-slate-500">Senior Product Designer</p><p class="mt-3 text-[10px] text-slate-400">New York, NY · alex.morgan@example.com</p></div>
-                            <div class="flex size-10 items-center justify-center rounded-xl bg-brand-50 text-sm font-bold text-brand-700">AM</div>
-                        </div>
-                        <p class="mt-5 text-[9px] font-bold uppercase tracking-[0.2em] text-brand-700">Profile</p>
-                        <p class="mt-2 text-[11px] leading-5 text-slate-500">Thoughtful product designer creating clear, useful experiences that connect people with better possibilities.</p>
-                        <p class="mt-5 text-[9px] font-bold uppercase tracking-[0.2em] text-brand-700">Experience</p>
-                        <div class="mt-3 flex items-center justify-between gap-3"><p class="text-[11px] font-semibold">Senior Product Designer</p><span class="text-[9px] text-slate-400">2022 — Present</span></div>
-                        <p class="mt-1 text-[10px] text-slate-400">Studio North · New York</p>
-                        <div class="mt-3 space-y-2"><div class="h-1.5 w-full rounded-full bg-slate-100"></div><div class="h-1.5 w-5/6 rounded-full bg-slate-100"></div><div class="h-1.5 w-2/3 rounded-full bg-slate-100"></div></div>
-                        <div class="mt-6 flex flex-wrap gap-2"><span class="rounded-md bg-brand-50 px-2.5 py-1.5 text-[9px] font-medium text-brand-700">Product strategy</span><span class="rounded-md bg-brand-50 px-2.5 py-1.5 text-[9px] font-medium text-brand-700">UX research</span><span class="rounded-md bg-brand-50 px-2.5 py-1.5 text-[9px] font-medium text-brand-700">Design systems</span></div>
-                    </div>
+                <div class="my-8 flex justify-center xl:my-10">
+                    <img src="{{ asset('images/login-career.png') }}" alt="Career illustration showing candidates and professional resumes" width="758" height="834" class="h-auto max-h-[46vh] w-full object-contain" fetchpriority="high">
                 </div>
                 <div class="flex items-center gap-3 border-t border-white/10 pt-6">
                     <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-brand-200"><svg class="size-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4v5c0 5-8 9-8 9s-8-4-8-9V7l8-4Z"/><path stroke-linecap="round" stroke-linejoin="round" d="m8 12 3 3 5-6"/></svg></span>
@@ -34,9 +21,8 @@
 
         <section class="relative flex min-h-dvh flex-col px-6 sm:px-12 lg:px-16">
             <header class="flex justify-end py-7 sm:py-9">
-                <a href="{{ route('login') }}" class="inline-flex items-center gap-2.5 text-sm font-bold text-ink" aria-label="Resume Assistant login">
-                    <img src="{{ asset('images/stella-logo.svg') }}" alt="" width="28" height="28" class="size-7">
-                    Resume Assistant
+                <a href="{{ route('login') }}" class="inline-flex items-center gap-2.5 text-sm font-bold text-ink" aria-label="CVGenio login">
+                    <img src="{{ asset('images/cvgenio-logo.png') }}" alt="CVGenio" width="900" height="274" class="h-auto w-40">
                 </a>
             </header>
             <div class="flex flex-1 items-center justify-center pb-16 pt-10 sm:pb-24">

@@ -5,6 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>{{ trim($__env->yieldContent('title', config('app.name', 'AI Resume Assistant'))) }}</title>
+        <link rel="icon" type="image/png" href="{{ asset('images/cvgenio-favicon.png') }}">
+        <link rel="apple-touch-icon" href="{{ asset('images/cvgenio-favicon.png') }}">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
     </head>
@@ -31,11 +33,7 @@
             >
                 <div class="flex items-center justify-between gap-2">
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
-                        <span class="grid h-10 w-10 place-items-center rounded-xl bg-brand-600 shadow-lg shadow-brand-500/20 text-sm font-black text-white">AI</span>
-                        <span>
-                            <span class="block text-sm font-bold">Resume Assistant</span>
-                            <span class="block text-xs text-muted">Career workspace</span>
-                        </span>
+                        <img src="{{ asset('images/cvgenio-logo.png') }}" alt="CVGenio" width="900" height="274" class="h-auto w-40">
                     </a>
 
                     <button type="button" @click="mobileMenuOpen = false" aria-label="Close navigation" class="grid size-9 shrink-0 place-items-center rounded-lg text-muted hover:bg-brand-50 lg:hidden">
@@ -103,7 +101,7 @@
                             <button type="button" @click="mobileMenuOpen = true" :aria-expanded="mobileMenuOpen" aria-controls="workspace-sidebar" aria-haspopup="dialog" aria-label="Open navigation" class="grid size-10 shrink-0 place-items-center rounded-xl border border-line bg-white text-brand-700 transition hover:bg-brand-50">
                                 <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
                             </button>
-                            <a href="{{ route('dashboard') }}" class="truncate font-bold">Resume Assistant</a>
+                            <a href="{{ route('dashboard') }}" class="shrink-0"><img src="{{ asset('images/cvgenio-logo.png') }}" alt="CVGenio" width="900" height="274" class="h-auto w-32"></a>
                         </div>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

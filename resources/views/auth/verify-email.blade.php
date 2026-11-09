@@ -3,7 +3,7 @@
 @section('content')
     <div class="flex min-h-screen items-center justify-center px-5 py-12">
         <div class="w-full max-w-lg rounded-lg border border-line bg-white p-8 text-center shadow-sm">
-            <span class="mx-auto grid h-12 w-12 place-items-center rounded-lg bg-brand-700 text-sm font-black text-white">AI</span>
+            <img src="{{ asset('images/cvgenio-logo.png') }}" alt="CVGenio" width="900" height="274" class="mx-auto h-auto w-40">
             <h1 class="mt-6 text-2xl font-black">Verify your email</h1>
             <p class="mt-3 text-sm leading-6 text-neutral-600">We sent a verification link to your inbox. Once verified, you can finish onboarding and create your master resume workspace.</p>
             @if (session('status') === 'verification-link-sent')
