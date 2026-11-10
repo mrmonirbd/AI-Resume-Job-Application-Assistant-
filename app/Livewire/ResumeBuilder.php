@@ -14,15 +14,24 @@ use App\Services\ImageExportService;
 use App\Services\PdfExportService;
 use App\Services\WordExportService;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Livewire\WithFileUploads;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ResumeBuilder extends Component
 {
+    use WithFileUploads;
+
+    public string $fullName = '';
+
+    public ?TemporaryUploadedFile $profilePhoto = null;
+
     public Resume $resume;
 
     public array $overview = [];
@@ -72,7 +81,36 @@ class ResumeBuilder extends Component
             'user', 'sections', 'experiences', 'educations', 'skills', 'projects',
             'certifications', 'languages', 'links', 'template',
         ]);
+        $this->fullName = $this->resume->user->name;
         $this->refreshState();
+    }
+
+    public function savePersonalInformation(): void
+    {
+        $this->authorizeOwner();
+        $validated = $this->validate([
+            'fullName' => ['required', 'string', 'max:255', 'regex:/\S/u'],
+            'profilePhoto' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+        ]);
+
+        $user = auth()->user();
+        $previousPhotoPath = $user->profile_photo_path;
+        $user->name = trim($validated['fullName']);
+
+        if ($this->profilePhoto) {
+            $user->profile_photo_path = $this->profilePhoto->store("profile-photos/{$user->id}", 'public');
+        }
+
+        $user->save();
+
+        if ($this->profilePhoto && $previousPhotoPath) {
+            Storage::disk('public')->delete($previousPhotoPath);
+        }
+
+        $this->reset('profilePhoto');
+        $this->fullName = $user->name;
+        $this->refreshState(false, false);
+        $this->notice = 'Personal information saved.';
     }
 
     public function updatedOverview(): void
