@@ -1,16 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320" role="img" aria-labelledby="title desc">
-    <title id="title">Demo profile placeholder</title>
-    <desc id="desc">A neutral person silhouette on a pale lavender background.</desc>
-    <defs>
-        <clipPath id="circle">
-            <circle cx="160" cy="160" r="148"/>
-        </clipPath>
-    </defs>
-    <circle cx="160" cy="160" r="156" fill="#FFFFFF"/>
-    <g clip-path="url(#circle)">
-        <circle cx="160" cy="160" r="148" fill="#F0EAF8"/>
-        <circle cx="160" cy="120" r="52" fill="#A795C2"/>
-        <path d="M58 302v-30c0-53 46-90 102-90s102 37 102 90v30H58Z" fill="#A795C2"/>
-    </g>
-    <circle cx="160" cy="160" r="147" fill="none" stroke="#FFFFFF" stroke-width="10"/>
+    <title id="title">Profile placeholder</title>
+    <desc id="desc">A simple gray person icon on a soft neutral background.</desc>
+    <circle cx="160" cy="160" r="160" fill="#F3F4F6"/>
+    <circle cx="160" cy="122" r="48" fill="#9CA3AF"/>
+    <path d="M75 254c0-40 38-66 85-66s85 26 85 66v8H75v-8Z" fill="#9CA3AF"/>
 </svg>

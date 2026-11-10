@@ -3,7 +3,7 @@
 @php
     $profileImage = $user?->profile_photo_path
         ? \Illuminate\Support\Facades\Storage::disk('public')->url($user->profile_photo_path)
-        : asset('images/demo-profile.svg');
+        : asset('images/demo-profile.svg').'?v=2';
 @endphp
 
 <span {{ $attributes->merge(['class' => 'block overflow-hidden rounded-full bg-white']) }}>

@@ -6,7 +6,7 @@
     @php
         $profilePhotoUrl = $user->profile_photo_path
             ? \Illuminate\Support\Facades\Storage::disk('public')->url($user->profile_photo_path)
-            : asset('images/demo-profile.svg');
+            : asset('images/demo-profile.svg').'?v=2';
     @endphp
     <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
         <div>
