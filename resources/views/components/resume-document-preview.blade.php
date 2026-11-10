@@ -36,7 +36,7 @@
     $sectionSpacing = ['compact' => 'mt-3', 'spacious' => 'mt-7'][$spacing] ?? 'mt-5';
     $bodyText = $spacing === 'compact' ? 'text-[11px]' : 'text-[12px]';
     $hasPhoto = (bool) data_get($settings, 'photo', false);
-    $contact = collect([$resume->user->email, $resume->user->location])->filter();
+    $contact = collect([$resume->contactEmail(), $resume->user->location])->filter();
     $hasSidebar = in_array($style, ['sidebar', 'soft-sidebar', 'right-rail', 'technical'], true);
     $usesDarkSidebar = in_array($style, ['sidebar', 'right-rail', 'technical'], true);
     $sidebarBackground = $usesDarkSidebar ? $dark : $soft;
@@ -51,9 +51,9 @@
         <div class="grid min-h-[720px] {{ $sidebarGridClass }}">
             <aside class="p-5" style="background: {{ $sidebarBackground }}; color: {{ $sidebarText }};">
                 @if ($hasPhoto)
-                    <x-demo-profile-image :user="$resume->user" class="mb-5 h-20 w-20 border-4 border-white/80" />
+                    <x-demo-profile-image :resume="$resume" class="mb-5 h-20 w-20 border-4 border-white/80" />
                 @endif
-                <h3 class="text-xl font-black uppercase leading-tight tracking-wide">{{ $resume->user->name }}</h3>
+                <h3 class="text-xl font-black uppercase leading-tight tracking-wide">{{ $resume->contactName() }}</h3>
                 @if ($title)
                     <p class="mt-2 text-xs font-semibold opacity-80">{{ $title }}</p>
                 @endif
@@ -145,10 +145,10 @@
             @endif
             <div class="relative flex items-center gap-5">
                 @if ($hasPhoto)
-                    <x-demo-profile-image :user="$resume->user" class="h-20 w-20 shrink-0 border-4 border-white" />
+                    <x-demo-profile-image :resume="$resume" class="h-20 w-20 shrink-0 border-4 border-white" />
                 @endif
                 <div>
-                    <h3 class="text-3xl font-black uppercase leading-none tracking-wide" style="color: {{ $style === 'dark-header' ? '#ffffff' : '#111827' }};">{{ $resume->user->name }}</h3>
+                    <h3 class="text-3xl font-black uppercase leading-none tracking-wide" style="color: {{ $style === 'dark-header' ? '#ffffff' : '#111827' }};">{{ $resume->contactName() }}</h3>
                     @if ($title)
                         <p class="mt-2 text-sm font-semibold" style="color: {{ $style === 'dark-header' ? '#ffffff' : $accent }};">{{ $title }}</p>
                     @endif
@@ -207,9 +207,9 @@
     @elseif ($style === 'timeline')
         <div class="p-7">
             <header class="flex items-center gap-5 border-b pb-5" style="border-color: {{ $accent }};">
-                <x-demo-profile-image :user="$resume->user" class="h-20 w-20 shrink-0 border-4 border-white shadow-sm" />
+                <x-demo-profile-image :resume="$resume" class="h-20 w-20 shrink-0 border-4 border-white shadow-sm" />
                 <div>
-                    <h3 class="text-3xl font-black uppercase leading-none">{{ $resume->user->name }}</h3>
+                    <h3 class="text-3xl font-black uppercase leading-none">{{ $resume->contactName() }}</h3>
                     <p class="mt-2 font-semibold" style="color: {{ $accent }};">{{ $title }}</p>
                     <p class="mt-1 text-neutral-500">{{ $contact->join(' · ') }}</p>
                 </div>
@@ -245,7 +245,7 @@
             @if ($slug === 'operator-compact')
                 <header class="grid grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] gap-4 border-b pb-4" style="border-color: {{ $accent }};">
                     <div>
-                        <h3 class="text-xl font-black uppercase tracking-wide">{{ $resume->user->name }}</h3>
+                        <h3 class="text-xl font-black uppercase tracking-wide">{{ $resume->contactName() }}</h3>
                         <p class="mt-1 font-semibold" style="color: {{ $accent }};">{{ $title }}</p>
                     </div>
                     <p class="break-words text-[10px] text-neutral-500">{{ $contact->join(' · ') }}</p>
@@ -253,7 +253,7 @@
             @elseif ($style === 'split')
                 <header class="grid grid-cols-[minmax(0,1fr)_0.4fr] gap-4">
                     <div class="py-3">
-                        <h3 class="text-2xl font-black uppercase tracking-wide">{{ $resume->user->name }}</h3>
+                        <h3 class="text-2xl font-black uppercase tracking-wide">{{ $resume->contactName() }}</h3>
                         <p class="mt-2 text-sm font-semibold" style="color: {{ $accent }};">{{ $title }}</p>
                         <p class="mt-2 break-words text-[10px] text-neutral-500">{{ $contact->join(' · ') }}</p>
                     </div>
@@ -262,7 +262,7 @@
             @elseif ($style === 'balanced')
                 <header class="flex items-start justify-between gap-3 border-b-2 pb-5" style="border-color: {{ $accent }};">
                     <div class="min-w-0">
-                        <h3 class="text-2xl font-black uppercase tracking-wide">{{ $resume->user->name }}</h3>
+                        <h3 class="text-2xl font-black uppercase tracking-wide">{{ $resume->contactName() }}</h3>
                         <p class="mt-2 font-semibold" style="color: {{ $accent }};">{{ $title }}</p>
                         <p class="mt-2 break-words text-[10px] text-neutral-500">{{ $contact->join(' · ') }}</p>
                     </div>
@@ -270,7 +270,7 @@
                 </header>
             @elseif ($style === 'brief')
                 <header class="border-l-4 pl-4" style="border-color: {{ $accent }};">
-                    <h3 class="text-2xl font-black uppercase tracking-wide">{{ $resume->user->name }}</h3>
+                    <h3 class="text-2xl font-black uppercase tracking-wide">{{ $resume->contactName() }}</h3>
                     <p class="mt-1 font-semibold" style="color: {{ $accent }};">{{ $title }}</p>
                     <p class="mt-2 text-neutral-500">{{ $contact->join(' · ') }}</p>
                 </header>
@@ -282,7 +282,7 @@
                     'text-center' => in_array(data_get($settings, 'header'), ['centered', 'small-center', 'formal'], true) || $style === 'editorial',
                     'tracking-[0.12em]' => $style === 'editorial',
                 ]) style="border-color: {{ $accent }};">
-                    <h3 @class(['font-black uppercase tracking-wide', 'text-xl' => in_array($style, ['dense', 'compact'], true), 'text-2xl' => ! in_array($style, ['dense', 'compact'], true)])>{{ $resume->user->name }}</h3>
+                    <h3 @class(['font-black uppercase tracking-wide', 'text-xl' => in_array($style, ['dense', 'compact'], true), 'text-2xl' => ! in_array($style, ['dense', 'compact'], true)])>{{ $resume->contactName() }}</h3>
                     @if ($title)
                         <p class="mt-1 text-sm font-semibold" style="color: {{ $accent }};">{{ $title }}</p>
                     @endif

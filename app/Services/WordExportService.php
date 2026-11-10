@@ -114,9 +114,9 @@ class WordExportService
         $settings = $resume->template?->settings ?? [];
         $dark = strtoupper(ltrim(data_get($settings, 'dark', '#1f2937'), '#'));
         $title = $resume->professional_title ?: $resume->user->professional_title;
-        $contact = collect([$resume->user->email, $resume->user->location])->filter()->join(' | ');
+        $contact = collect([$resume->contactEmail(), $resume->user->location])->filter()->join(' | ');
         $sidebar = [
-            $this->paragraph($resume->user->name, ['bold' => true, 'color' => 'FFFFFF', 'size' => 28, 'spaceAfter' => 100]),
+            $this->paragraph($resume->contactName(), ['bold' => true, 'color' => 'FFFFFF', 'size' => 28, 'spaceAfter' => 100]),
             $this->paragraph($title, ['bold' => true, 'color' => 'E5E7EB', 'spaceAfter' => 280]),
             $this->heading('Contact', 'D1D5DB'),
             $this->paragraph($contact, ['color' => 'D1D5DB', 'spaceAfter' => 280]),

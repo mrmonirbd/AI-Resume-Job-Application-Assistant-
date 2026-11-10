@@ -1,8 +1,9 @@
-@props(['alt' => 'Profile photo', 'user' => null])
+@props(['alt' => 'Profile photo', 'user' => null, 'resume' => null])
 
 @php
-    $profileImage = $user?->profile_photo_path
-        ? \Illuminate\Support\Facades\Storage::disk('public')->url($user->profile_photo_path)
+    $photoPath = $resume ? $resume->profilePhotoPath() : $user?->profile_photo_path;
+    $profileImage = $photoPath
+        ? \Illuminate\Support\Facades\Storage::disk('public')->url($photoPath)
         : asset('images/demo-profile.svg').'?v=2';
 @endphp
 

@@ -22,6 +22,25 @@ class Resume extends Model
         ];
     }
 
+    public function contactName(): string
+    {
+        return data_get($this->settings, 'personal_information.name') ?? $this->user->name;
+    }
+
+    public function contactEmail(): string
+    {
+        return data_get($this->settings, 'personal_information.email') ?? $this->user->email;
+    }
+
+    public function profilePhotoPath(): ?string
+    {
+        $personalInformation = $this->settings['personal_information'] ?? [];
+
+        return array_key_exists('profile_photo_path', $personalInformation)
+            ? $personalInformation['profile_photo_path']
+            : $this->user->profile_photo_path;
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

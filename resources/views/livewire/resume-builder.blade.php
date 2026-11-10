@@ -32,17 +32,22 @@
                 <h2 class="text-lg font-black">Personal information</h2>
                 <button wire:loading.attr="disabled" wire:target="profilePhoto,savePersonalInformation" type="submit" class="rounded-lg bg-brand-700 px-4 py-2 text-sm font-black text-white">Save profile</button>
             </div>
-            <p class="mt-2 text-xs text-muted">Your name and photo are shared across your account and resumes. Photos appear in templates that include a profile picture.</p>
+            <p class="mt-2 text-xs text-muted">Your name, email, and photo are saved only for this resume. Photos appear in templates that include a profile picture.</p>
             <label class="mt-5 block">
                 <span class="text-sm font-semibold">Full name</span>
                 <input wire:model="fullName" autocomplete="name" required maxlength="255" class="mt-2 w-full rounded-lg border border-line px-4 py-3 text-sm">
                 @error('fullName') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
             </label>
+            <label class="mt-5 block">
+                <span class="text-sm font-semibold">Email</span>
+                <input wire:model="contactEmail" type="email" autocomplete="email" required maxlength="255" class="mt-2 w-full rounded-lg border border-line px-4 py-3 text-sm">
+                @error('contactEmail') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            </label>
             <div class="mt-5 flex flex-wrap items-center gap-4">
-                <x-demo-profile-image :user="$resume->user" class="h-20 w-20 shrink-0 border border-line" />
+                <x-demo-profile-image :resume="$resume" class="h-20 w-20 shrink-0 border border-line" />
                 <label class="block min-w-0 flex-1">
                     <span class="text-sm font-semibold">Profile picture</span>
-                    <input wire:key="profile-photo-{{ $resume->user->profile_photo_path ?? 'default' }}" wire:model="profilePhoto" type="file" accept="image/jpeg,image/png,image/webp" class="mt-2 block w-full text-sm text-neutral-600 file:mr-4 file:rounded-md file:border-0 file:bg-brand-700 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white">
+                    <input wire:key="profile-photo-{{ $resume->profilePhotoPath() ?? 'default' }}" wire:model="profilePhoto" type="file" accept="image/jpeg,image/png,image/webp" class="mt-2 block w-full text-sm text-neutral-600 file:mr-4 file:rounded-md file:border-0 file:bg-brand-700 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white">
                     <span class="mt-2 block text-xs text-muted">JPG, PNG, or WebP. Maximum 2 MB. Select a photo, then save your profile.</span>
                     <span wire:loading wire:target="profilePhoto" role="status" class="mt-2 text-xs text-muted">Uploading photo…</span>
                     @if ($profilePhoto) <span class="mt-2 block text-xs text-muted">Photo selected. Save profile to apply it.</span> @endif

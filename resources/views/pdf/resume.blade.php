@@ -20,13 +20,13 @@
         $collections[$relation] = data_get($sectionSettings->get($type), 'is_visible', true) ? $resume->$relation : collect();
     }
     $title = $resume->professional_title ?? $resume->user->professional_title;
-    $contact = collect([$resume->user->email, $resume->user->location])->filter()->join(' | ');
+    $contact = collect([$resume->contactEmail(), $resume->user->location])->filter()->join(' | ');
     $hasSidebar = in_array($style, ['sidebar', 'soft-sidebar', 'right-rail', 'technical'], true);
     $usesDarkSidebar = in_array($style, ['sidebar', 'right-rail', 'technical'], true);
     $sidebarBackground = $usesDarkSidebar ? $dark : $soft;
     $sidebarText = $usesDarkSidebar ? '#ffffff' : '#111827';
-    $profileImagePath = $resume->user->profile_photo_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($resume->user->profile_photo_path)
-        ? \Illuminate\Support\Facades\Storage::disk('public')->path($resume->user->profile_photo_path)
+    $profileImagePath = $resume->profilePhotoPath() && \Illuminate\Support\Facades\Storage::disk('public')->exists($resume->profilePhotoPath())
+        ? \Illuminate\Support\Facades\Storage::disk('public')->path($resume->profilePhotoPath())
         : public_path('images/demo-profile.png');
     $profileImageMime = file_exists($profileImagePath) ? mime_content_type($profileImagePath) : null;
     $profileImageSource = $profileImageMime ? 'data:'.$profileImageMime.';base64,'.base64_encode((string) file_get_contents($profileImagePath)) : null;
@@ -103,7 +103,7 @@
                         @if ($profileImageSource)
                             <img class="avatar" src="{{ $profileImageSource }}" alt="">
                         @endif
-                        <h1>{{ $resume->user->name }}</h1>
+                        <h1>{{ $resume->contactName() }}</h1>
                         @if ($title)
                             <p style="margin-top: 8px;"><strong>{{ $title }}</strong></p>
                         @endif
@@ -134,7 +134,7 @@
             </aside>
             <main class="sidebar-main {{ data_get($settings, 'sidebar') === 'right' ? 'sidebar-main-right' : 'sidebar-main-left' }}">
                 @if (data_get($settings, 'sidebar') === 'right')
-                    <h1>{{ $resume->user->name }}</h1>
+                    <h1>{{ $resume->contactName() }}</h1>
                     @if ($title)
                         <p class="accent"><strong>{{ $title }}</strong></p>
                     @endif
@@ -184,7 +184,7 @@
                         <td class="header-photo"><img class="avatar" src="{{ $profileImageSource }}" alt=""></td>
                     @endif
                     <td>
-                        <h1>{{ $resume->user->name }}</h1>
+                        <h1>{{ $resume->contactName() }}</h1>
                         @if ($title)
                             <p class="accent"><strong>{{ $title }}</strong></p>
                         @endif
@@ -240,7 +240,7 @@
             </main>
         @elseif ($style === 'timeline')
             <main class="sheet">
-                <h1>{{ $resume->user->name }}</h1>
+                <h1>{{ $resume->contactName() }}</h1>
                 @if ($title)
                     <p class="accent"><strong>{{ $title }}</strong></p>
                 @endif
@@ -275,7 +275,7 @@
                 @if ($style === 'split')
                     <table class="split-header"><tr>
                         <td class="identity">
-                            <h1>{{ $resume->user->name }}</h1>
+                            <h1>{{ $resume->contactName() }}</h1>
                             @if ($title)<p class="accent"><strong>{{ $title }}</strong></p>@endif
                             <p class="muted">{{ $contact }}</p>
                         </td>
@@ -283,7 +283,7 @@
                     </tr></table>
                 @else
                     <header class="header" style="{{ in_array(data_get($settings, 'header'), ['centered', 'small-center', 'formal'], true) ? 'text-align: center;' : '' }}">
-                        <h1>{{ $resume->user->name }}</h1>
+                        <h1>{{ $resume->contactName() }}</h1>
                         @if ($title)<p class="accent"><strong>{{ $title }}</strong></p>@endif
                         <p class="muted">{{ $contact }}</p>
                     </header>

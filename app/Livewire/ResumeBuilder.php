@@ -30,6 +30,8 @@ class ResumeBuilder extends Component
 
     public string $fullName = '';
 
+    public string $contactEmail = '';
+
     public ?TemporaryUploadedFile $profilePhoto = null;
 
     public Resume $resume;
@@ -81,7 +83,8 @@ class ResumeBuilder extends Component
             'user', 'sections', 'experiences', 'educations', 'skills', 'projects',
             'certifications', 'languages', 'links', 'template',
         ]);
-        $this->fullName = $this->resume->user->name;
+        $this->fullName = $this->resume->contactName();
+        $this->contactEmail = $this->resume->contactEmail();
         $this->refreshState();
     }
 
@@ -90,25 +93,39 @@ class ResumeBuilder extends Component
         $this->authorizeOwner();
         $validated = $this->validate([
             'fullName' => ['required', 'string', 'max:255', 'regex:/\S/u'],
+            'contactEmail' => ['required', 'email', 'max:255'],
             'profilePhoto' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
         ]);
 
-        $user = auth()->user();
-        $previousPhotoPath = $user->profile_photo_path;
-        $user->name = trim($validated['fullName']);
+        $photoPath = $this->resume->profilePhotoPath();
 
         if ($this->profilePhoto) {
-            $user->profile_photo_path = $this->profilePhoto->store("profile-photos/{$user->id}", 'public');
+            $photoPath = $this->profilePhoto->store("resume-photos/{$this->resume->id}", 'public');
+        } elseif ($photoPath && ! array_key_exists('profile_photo_path', $this->resume->settings['personal_information'] ?? [])) {
+            if (Storage::disk('public')->exists($photoPath)) {
+                $snapshotPath = "resume-photos/{$this->resume->id}/".str()->uuid().'.'.pathinfo($photoPath, PATHINFO_EXTENSION);
+                Storage::disk('public')->copy($photoPath, $snapshotPath);
+                $photoPath = $snapshotPath;
+            } else {
+                $photoPath = null;
+            }
         }
 
-        $user->save();
-
-        if ($this->profilePhoto && $previousPhotoPath) {
-            Storage::disk('public')->delete($previousPhotoPath);
-        }
+        $this->resume->update([
+            'settings' => [
+                ...($this->resume->settings ?? []),
+                'personal_information' => [
+                    'name' => trim($validated['fullName']),
+                    'email' => $validated['contactEmail'],
+                    'profile_photo_path' => $photoPath,
+                ],
+            ],
+            'last_edited_at' => now(),
+        ]);
 
         $this->reset('profilePhoto');
-        $this->fullName = $user->name;
+        $this->fullName = $this->resume->contactName();
+        $this->contactEmail = $this->resume->contactEmail();
         $this->refreshState(false, false);
         $this->notice = 'Personal information saved.';
     }
