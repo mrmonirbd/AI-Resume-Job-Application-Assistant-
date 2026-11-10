@@ -2,8 +2,9 @@
     <aside class="rounded-lg border border-line bg-white p-4 shadow-sm xl:sticky xl:top-6 xl:max-h-[calc(100dvh-3rem)] xl:self-start xl:overflow-y-auto">
         <p class="text-xs font-bold uppercase tracking-[0.18em] text-muted">Sections</p>
         <nav class="mt-4 space-y-1 text-sm font-semibold">
-            <a href="#personal-information" class="block rounded-md px-3 py-2 text-neutral-600 hover:bg-cream hover:text-ink">Name &amp; photo</a>
+            <a href="#personal-information" class="block rounded-md px-3 py-2 text-neutral-600 hover:bg-cream hover:text-ink">Personal information</a>
             @foreach ($sections as $id => $section)
+                @continue($resume->sections->firstWhere('id', $id)?->type === 'personal')
                 <a wire:key="section-link-{{ $id }}" href="#section-{{ $id }}" class="block rounded-md px-3 py-2 text-neutral-600 hover:bg-cream hover:text-ink">{{ $section['title'] }}</a>
             @endforeach
         </nav>
@@ -132,6 +133,7 @@
             </div>
             <div class="mt-5 space-y-4">
                 @foreach ($sections as $id => $section)
+                @continue($resume->sections->firstWhere('id', $id)?->type === 'personal')
                     <div wire:key="section-{{ $id }}" id="section-{{ $id }}" class="rounded-lg border border-line p-4">
                         <div class="grid gap-3 md:grid-cols-[minmax(0,1fr)_80px] 2xl:grid-cols-[minmax(0,1fr)_90px_70px]">
                             <input aria-label="Title" wire:model.live.debounce.300ms="sections.{{ $id }}.title" class="md:col-span-2 2xl:col-span-1 rounded-lg border border-line px-3 py-2 text-sm font-semibold">
