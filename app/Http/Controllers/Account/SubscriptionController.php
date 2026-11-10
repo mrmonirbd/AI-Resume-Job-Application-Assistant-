@@ -73,7 +73,7 @@ class SubscriptionController extends Controller
         }
 
         if (! $crm->isSuccessful($response)) {
-            return back()->withErrors(['subscription' => 'The CRM could not cancel this subscription. Please contact support.']);
+            return back()->withErrors(['subscription' => 'Something went wrong. Please contact support.']);
         }
 
         $user->subscriptions()->latest()->first()?->update([

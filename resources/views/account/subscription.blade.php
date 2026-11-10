@@ -24,14 +24,12 @@
                             <label class="block"><span class="text-sm font-semibold">{{ $label }}</span><input value="{{ $value }}" disabled class="mt-2 w-full rounded-md border border-line bg-neutral-50 px-4 py-3 text-sm text-neutral-600"></label>
                         @endforeach
                     </div>
-                    @if (filled($user->crm_subscription_id) && strtolower((string) $status) === 'active')
-                        <form id="cancel-subscription" method="POST" action="{{ route('subscription.cancel') }}" class="mt-8 border-t border-line pt-6" onsubmit="return confirm('Cancel this subscription through the CRM?')">
-                            @csrf
-                            <input type="hidden" name="confirmation" value="cancel">
-                            <p class="text-sm leading-6 text-neutral-600">Cancelling is sent directly to the CRM and stops future renewal under the CRM billing terms.</p>
-                            <button class="mt-4 rounded-md bg-brand-700 px-5 py-3 text-sm font-black text-white">Cancel subscription</button>
-                        </form>
-                    @endif
+                    <form id="cancel-subscription" method="POST" action="{{ route('subscription.cancel') }}" class="mt-8 border-t border-line pt-6" onsubmit="return confirm('Cancel this subscription through the CRM?')">
+                        @csrf
+                        <input type="hidden" name="confirmation" value="cancel">
+                        {{-- <p class="text-sm leading-6 text-neutral-600">Cancelling is sent directly to the CRM and stops future renewal under the CRM billing terms.</p> --}}
+                        <button type="submit" class="mt-4 rounded-md bg-brand-700 px-5 py-3 text-sm font-black text-white">Cancel Subscription</button>
+                    </form>
                 </div>
             </section>
         </div>
