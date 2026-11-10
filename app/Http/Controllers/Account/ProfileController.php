@@ -59,11 +59,11 @@ class ProfileController extends Controller
                     'subscription_id' => $user->crm_subscription_id,
                 ]);
             } catch (ConnectionException) {
-                return back()->withErrors(['profile' => 'We could not update your CRM account. Please try again.']);
+                return back()->withErrors(['profile' => 'Something went wrong. Please contact support.']);
             }
 
             if (! $crm->isSuccessful($response)) {
-                return back()->withErrors(['profile' => 'The CRM could not update your profile. Please try again.']);
+                return back()->withErrors(['profile' => 'Something went wrong. Please contact support.']);
             }
         }
 
