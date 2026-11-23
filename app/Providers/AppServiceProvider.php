@@ -9,6 +9,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 
@@ -28,6 +29,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Vite::createAssetPathsUsing(function (string $path, ?bool $secure): string {
+            $url = asset($path, $secure);
+
+            if (! str_ends_with($path, '.css') || ! is_file(public_path($path))) {
+                return $url;
+            }
+
+            return $url.'?v='.substr(hash_file('sha256', public_path($path)), 0, 12);
+        });
+
         RateLimiter::for('ai', function (Request $request) {
             return Limit::perMinute(12)->by($request->user()?->id ?: $request->ip());
         });
