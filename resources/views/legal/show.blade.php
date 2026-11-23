@@ -42,7 +42,7 @@
         <header class="sticky top-0 z-20 border-b border-line bg-white/95 px-5 py-4 backdrop-blur lg:hidden">
             <div class="flex items-center justify-between gap-4">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-3 font-bold">
-                    <img src="{{ asset('images/cvgenio-logo.png') }}" alt="CVGenio" width="900" height="274" class="h-auto w-40">
+                    <img src="{{ asset('images/rezumax-stacked.svg') }}" alt="Rezumax" width="900" height="274" class="aspect-[160/49] object-contain h-auto w-40">
                 </a>
                 <a href="{{ route('login') }}" class="text-sm font-semibold text-neutral-600 hover:text-ink">Log in</a>
             </div>
@@ -50,7 +50,7 @@
 
         <aside class="fixed inset-y-0 left-0 z-30 hidden w-72 flex-col overflow-y-auto border-r border-line bg-white p-5 lg:flex">
             <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
-                <img src="{{ asset('images/cvgenio-logo.png') }}" alt="CVGenio" width="900" height="274" class="h-auto w-40">
+                <img src="{{ asset('images/rezumax-stacked.svg') }}" alt="Rezumax" width="900" height="274" class="aspect-[160/49] object-contain h-auto w-40">
             </a>
 
             <nav class="mt-10 space-y-1 text-sm font-medium">

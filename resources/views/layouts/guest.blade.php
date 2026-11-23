@@ -4,9 +4,9 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>{{ config('app.name', 'CVGenio') }}</title>
-        <link rel="icon" type="image/png" href="{{ asset('images/cvgenio-favicon.png') }}">
-        <link rel="apple-touch-icon" href="{{ asset('images/cvgenio-favicon.png') }}">
+        <title>@yield('title', config('app.name', 'Rezumax'))</title>
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}?v=rezumax">
+        <link rel="icon" type="image/svg+xml" sizes="any" href="{{ asset('images/rezumax-tab.svg') }}?v=rezumax">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
     </head>

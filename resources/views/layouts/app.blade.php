@@ -4,9 +4,9 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>{{ trim($__env->yieldContent('title', config('app.name', 'CVGenio'))) }}</title>
-        <link rel="icon" type="image/png" href="{{ asset('images/cvgenio-favicon.png') }}">
-        <link rel="apple-touch-icon" href="{{ asset('images/cvgenio-favicon.png') }}">
+        <title>{{ trim($__env->yieldContent('title', config('app.name', 'Rezumax'))) }}</title>
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}?v=rezumax">
+        <link rel="icon" type="image/svg+xml" sizes="any" href="{{ asset('images/rezumax-tab.svg') }}?v=rezumax">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
     </head>
@@ -31,12 +31,12 @@
                 @click="if ($event.target.closest('a')) mobileMenuOpen = false"
                 class="fixed inset-y-0 left-0 z-50 flex w-72 max-w-[calc(100vw-2rem)] flex-col overflow-y-auto border-r border-line bg-white p-5 transition-transform duration-200 motion-reduce:transition-none lg:translate-x-0"
             >
-                <div class="flex items-center justify-between gap-2">
-                    <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
-                        <img src="{{ asset('images/cvgenio-logo.png') }}" alt="CVGenio" width="900" height="274" class="h-auto w-40">
+                <div class="relative flex items-center justify-center">
+                    <a href="{{ route('dashboard') }}" class="inline-flex rounded-lg">
+                        <img src="{{ asset('images/rezumax-stacked.svg') }}" alt="Rezumax" width="88" height="60" class="aspect-[88/60] h-auto w-24 object-contain">
                     </a>
 
-                    <button type="button" @click="mobileMenuOpen = false" aria-label="Close navigation" class="grid size-9 shrink-0 place-items-center rounded-lg text-muted hover:bg-brand-50 lg:hidden">
+                    <button type="button" @click="mobileMenuOpen = false" aria-label="Close navigation" class="absolute right-0 grid size-9 shrink-0 place-items-center rounded-lg text-muted hover:bg-brand-50 lg:hidden">
                         <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
                     </button>
                 </div>
@@ -101,7 +101,7 @@
                             <button type="button" @click="mobileMenuOpen = true" :aria-expanded="mobileMenuOpen" aria-controls="workspace-sidebar" aria-haspopup="dialog" aria-label="Open navigation" class="grid size-10 shrink-0 place-items-center rounded-xl border border-line bg-white text-brand-700 transition hover:bg-brand-50">
                                 <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
                             </button>
-                            <a href="{{ route('dashboard') }}" class="shrink-0"><img src="{{ asset('images/cvgenio-logo.png') }}" alt="CVGenio" width="900" height="274" class="h-auto w-32"></a>
+                            <a href="{{ route('dashboard') }}" class="shrink-0"><img src="{{ asset('images/rezumax-stacked.svg') }}" alt="Rezumax" width="900" height="274" class="aspect-[160/49] object-contain h-auto w-32"></a>
                         </div>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

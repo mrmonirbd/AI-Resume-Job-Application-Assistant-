@@ -1,0 +1,12 @@
+<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 60">
+  <title>Rezumax</title>
+  <defs>
+    <linearGradient id="rezumax-accent" x2="1" y2="1">
+      <stop stop-color="#FF6A45"/>
+      <stop offset="1" stop-color="#FF4F8B"/>
+    </linearGradient>
+  </defs>
+  <rect x="24" y="1" width="40" height="38" rx="9" fill="url(#rezumax-accent)"/>
+  <path d="M53 30H35V9h12l6 6v15ZM47 9v7h6M39 21h10m-10 4h7" fill="none" stroke="#FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="44" y="55" text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Rezumax</text>
+</svg>
